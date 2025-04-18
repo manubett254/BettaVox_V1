@@ -10,34 +10,68 @@
 <body>
 
     <!-- Header -->
-    <header>
-        <h1><a href="{{ url_for('index') }}">BettaVox</a></h1>
-        <div class="nav-container">
-            <nav>
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('upload') }}">Upload</a>
-                <a href="{{ url_for('about') }}">About</a>
-            </nav>
+    <header class="header">
+        <div class="logo-container">
+            <h1><a href="{{ url_for('index') }}">BettaVox</a></h1>
         </div>
+        <nav class="nav">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('upload') }}" class="nav-link">Upload</a>
+            <a href="{{ url_for('about') }}" class="nav-link active">About</a>
+        </nav>
     </header>
 
-    <!-- Main Content -->
-    <main class="container">
-        <h2>About BettaVox</h2>
-        <p>BettaVox is an AI-powered system that analyzes voice characteristics to predict age and gender.</p>
-        <p>Using advanced machine learning techniques, BettaVox extracts features from voice samples and provides accurate predictions based on extensive training data.</p>
-        <h3>How It Works</h3>
-        <ul>
-            <li>Upload or record your voice sample.</li>
-            <li>BettaVox extracts key features from the audio.</li>
-            <li>Our AI model predicts your age group and gender.</li>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h2>Discover BettaVox</h2>
+            <p>BettaVox is an advanced AI-powered system that analyzes voice characteristics to predict age and gender with remarkable accuracy.</p>
+            <a href="{{ url_for('upload') }}" class="btn hero-btn">Try It Now</a>
+        </div>
+        <div class="hero-image">
+            <img src="{{ url_for('static', filename='images/voice-analysis.svg') }}" alt="Voice Analysis Illustration">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <h2>How BettaVox Works</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Upload Your Voice</h3>
+                <p>Simply upload or record your voice sample through our intuitive interface.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Extract Key Features</h3>
+                <p>Our AI extracts over 50 features from your audio, including pitch, tone, and spectral characteristics.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Predict Age & Gender</h3>
+                <p>Using machine learning models trained on extensive datasets, we predict your age group and gender.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits-section">
+        <h2>Why Choose BettaVox?</h2>
+        <ul class="benefits-list">
+            <li>Accurate predictions powered by state-of-the-art AI.</li>
+            <li>User-friendly interface for seamless interaction.</li>
+            <li>Privacy-focused: Your data is never stored or shared.</li>
+            <li>Fast and efficient processing for real-time results.</li>
         </ul>
-        <p>Try it out and experience the power of voice analysis!</p>
-        <a href="{{ url_for('upload') }}" class="btn">Try Now</a>
-    </main>
+    </section>
+
+    <!-- Call-to-Action Section -->
+    <section class="cta-section">
+        <h2>Ready to Experience BettaVox?</h2>
+        <p>Unlock the power of voice analysis today!</p>
+        <a href="{{ url_for('upload') }}" class="btn cta-btn">Get Started</a>
+    </section>
 
     <!-- Footer -->
-    <footer>
+    <footer class="footer">
         <p>&copy; 2025 BettaVox. All rights reserved.</p>
     </footer>
 
