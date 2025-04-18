@@ -150,6 +150,65 @@ nav a:focus {
     color: white;
 }
 
+/* Centered Content for About Page */
+.hero-section, 
+.features-section, 
+.benefits-section, 
+.cta-section {
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 40px auto;
+    max-width: 1000px;
+}
+
+.feature-card {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.benefits-list {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+    list-style-type: none;
+    padding: 0;
+}
+
+.benefits-list li {
+    margin-bottom: 15px;
+    padding-left: 30px;
+    position: relative;
+}
+
+.benefits-list li:before {
+    content: "✓";
+    color: var(--secondary-color);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
 /* Buttons */
 .btn {
     display: inline-block;
@@ -212,6 +271,8 @@ footer {
 /* Audio Playback */
 audio {
     margin-top: 10px;
+    width: 100%;
+    max-width: 400px;
 }
 
 /* Recording Section */
@@ -240,12 +301,15 @@ audio {
     margin: 15px 0;
     width: 100%;
     max-width: 400px;
+    height: 100px;
 }
 
 .recording-controls {
     display: flex;
     gap: 10px;
     margin-top: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 /* Progress Bar */
@@ -314,6 +378,39 @@ audio {
 
     #waveform {
         width: 95%;
+    }
+
+    .hero-section, 
+    .features-section, 
+    .benefits-section, 
+    .cta-section {
+        padding: 20px 10px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .hero-content {
+        padding: 0 10px;
+    }
+
+    .hero-image img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .recording-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 200px;
     }
 }
 
@@ -421,9 +518,6 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-
-
-
 #recording-section.active,
 #stop-btn.active,
 .recording-controls,
@@ -433,4 +527,45 @@ input:checked + .slider:before {
 #uploaded-audio.active,
 #processing-section.active {
     display: block;
+}
+
+/* Hero Section Specific Styles */
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.hero-content {
+    margin-bottom: 30px;
+}
+
+.hero-image {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+}
+
+@media (min-width: 992px) {
+    .hero-section {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .hero-content {
+        flex: 1;
+        padding-right: 40px;
+        text-align: left;
+    }
+
+    .hero-image {
+        flex: 1;
+    }
 }
