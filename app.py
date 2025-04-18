@@ -95,7 +95,6 @@ def about():
 def error():
     return render_template('error.html')
 
-
 @app.route("/predict", methods=["POST"])
 def predict():
     file = request.files.get("audio")
