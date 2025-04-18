@@ -111,7 +111,9 @@ def predict():
         file.save(filepath)
         try:
             logging.info(f"🟢 Processing file: {filepath}")
+            logging.info("Starting feature extraction...")
             features = extract_features(filepath)
+            logging.info("Feature extraction completed.")
             logging.info(f"✅ Features successfully extracted and formatted (Total: {len(features)} features)")
             
             # Convert features to a dictionary for serialization
