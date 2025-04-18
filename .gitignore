@@ -1,0 +1,20 @@
+# Ignore Python compiled files
+__pycache__/
+*.pyc
+
+# Ignore virtual environments
+venv/
+env/
+
+# Ignore uploaded files (optional, depending on your use case)
+uploads/
+
+# Ignore database files (if you don't want to push them)
+*.db
+
+# Ignore IDE-specific files
+.vscode/
+.idea/
+
+# Ignore environment files
+.env

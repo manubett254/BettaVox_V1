@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - BettaVox</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header>
+    <h1><a href="{{ url_for('index') }}">BettaVox</a></h1>
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('upload') }}">Upload</a>
+        <a href="{{ url_for('about') }}">About</a>
+        
+    </nav>
+</header>
+<div class="container" id="result-container">
+    <h2>✅ Analysis Results</h2>
+    <p><strong>Predicted Gender:</strong> <span id="gender-result">Loading...</span></p>
+    <p><strong>Predicted Age Group:</strong> <span id="age-result">Loading...</span></p>
+    <p><strong>Confidence Score:</strong> <span id="confidence-score">Loading...</span></p>
+    <h3>Was this prediction correct?</h3>
+    <button onclick="submitFeedback(true)" class="feedback-btn">Yes</button>
+    <button onclick="showCorrectionForm()" class="feedback-btn">No</button>
+    <div id="correction-form" style="display: none; margin-top: 10px;">
+        <h3>What was incorrect?</h3>
+        <label><input type="checkbox" id="wrong-gender" onchange="toggleCorrectionFields()"> Gender</label>
+        <label><input type="checkbox" id="wrong-age" onchange="toggleCorrectionFields()"> Age</label>
+        <br>
+        <div id="correction-fields" style="display: none; margin-top: 10px;">
+            <label for="correct-gender">Correct Gender:</label>
+            <select id="correct-gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+            <br>
+            <label for="correct-age">Correct Age:</label>
+            <input type="number" id="correct-age" min="1" max="100">
+        </div>
+        <button id="submit-correction-btn" onclick="submitCorrection()" class="feedback-btn" style="margin-top: 10px; display: none;">
+            Submit Correction
+        </button>
+    </div>
+    <p id="feedback-message" class="success-msg" style="display: none; color: green; font-weight: bold; margin-top: 10px;"></p>
+    <button onclick="window.location.href='{{ url_for('upload') }}'" class="btn">Try Again</button>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let results = localStorage.getItem("analysisResults");
+        if (results) {
+            results = JSON.parse(results);
+            document.getElementById("gender-result").textContent = results.gender || "Unknown";
+            document.getElementById("age-result").textContent = results.age_group || "Unknown";
+            let confidence = results.gender_confidence || 0;
+            document.getElementById("confidence-score").textContent = confidence.toFixed(2) + "%";
+        } else {
+            console.error("Results not found in localStorage.");
+            document.getElementById("result-container").innerHTML = "<p>Results unavailable. Try again.</p>";
+        }
+    });
+
+    function showCorrectionForm() {
+        document.querySelector("h3").textContent = "What was incorrect?";
+        document.querySelectorAll(".feedback-btn").forEach(btn => btn.style.display = "none");
+        document.getElementById("correction-form").style.display = "block";
+    }
+
+    function toggleCorrectionFields() {
+        let wrongGender = document.getElementById("wrong-gender").checked;
+        let wrongAge = document.getElementById("wrong-age").checked;
+        let correctionFields = document.getElementById("correction-fields");
+        let submitBtn = document.getElementById("submit-correction-btn");
+        correctionFields.style.display = (wrongGender || wrongAge) ? "block" : "none";
+        submitBtn.style.display = (wrongGender || wrongAge) ? "inline-block" : "none";
+        // If only age is incorrect, set the correct gender automatically
+        if (!wrongGender && wrongAge) {
+            let results = JSON.parse(localStorage.getItem("analysisResults"));
+            document.getElementById("correct-gender").value = results.gender;
+        }
+    }
+
+    function submitFeedback(isCorrect) {
+        let results = JSON.parse(localStorage.getItem("analysisResults"));
+        fetch("/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: results.id,
+                is_correct: isCorrect ? 1 : 0
+            })
+        }).then(() => {
+            document.getElementById("feedback-message").textContent = "Feedback submitted. Thank you!";
+            document.getElementById("feedback-message").style.display = "block";
+            document.querySelectorAll(".feedback-btn").forEach(btn => btn.style.display = "none");
+        });
+    }
+
+    function submitCorrection() {
+    let results = JSON.parse(localStorage.getItem("analysisResults"));
+    let correctGender = document.getElementById("correct-gender").value;
+    let correctAge = document.getElementById("correct-age").value;
+    let wrongGender = document.getElementById("wrong-gender").checked;
+    let wrongAge = document.getElementById("wrong-age").checked;
+    fetch("/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            id: results.id,
+            is_correct: 0,
+            corrected_gender: wrongGender ? correctGender : null,
+            corrected_age_group: wrongAge ? correctAge : null,
+            user_feedback: "User provided corrections"
+        })
+    }).then(() => {
+        document.getElementById("correction-form").innerHTML = "<p class='success-msg' style='color: green; font-weight: bold;'>Correction submitted. Thank you!</p>";
+    });
+}
+</script>
+<footer>
+    <p>© 2025 BettaVox. All rights reserved.</p>
+</footer>
+</body>
+</html>
