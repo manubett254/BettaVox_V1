@@ -8,6 +8,6 @@ werkzeug
 joblib 
 soundfile
 gunicorn
-librosa==0.10.1
-numba==0.59.0  # or the latest version
-llvmlite==0.41.0
+librosa
+numba
+llvmlite
