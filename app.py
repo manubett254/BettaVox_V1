@@ -98,7 +98,10 @@ def error():
 @app.route("/predict", methods=["POST"])
 def predict():
     file = request.files.get("audio")
-    model_type = request.args.get("model", "svm")
+    model_type = request.form.get("model", "svm")
+    logging.info(f"📥 Received model: {model_type}")
+    
+    
     if model_type not in MODELS:
         logging.error("Invalid model type provided")
         return jsonify({"error": "Invalid model type. Choose 'svm' or 'lr'"}), 400
@@ -122,6 +125,7 @@ def predict():
             features_df = pd.DataFrame([features], columns=FEATURE_LIST)
             features_scaled_gender = SCALER_GENDER.transform(features_df)
             gender_prediction = MODELS[model_type].predict(features_scaled_gender)[0]
+            logging.info(f"🔍 Model selected: {model_type.upper()}")
             gender_confidence = MODELS[model_type].predict_proba(features_scaled_gender)[0]
             gender_label = "Female" if gender_prediction == 1 else "Male"
             gender_confidence_score = float(max(gender_confidence)) * 100

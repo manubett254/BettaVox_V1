@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
         confidenceScore: document.getElementById("confidence-score"),
         feedbackMessage: document.getElementById("feedback-message"),
     };
-
+    
     // Audio variables
     let audioContext, analyser, mediaRecorder, audioStream;
     let animationFrameId, recordingInterval;
@@ -82,7 +82,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+                console.log("Uploading file:", uploadedFile.name, uploadedFile.type);
+
                 elements.recordedAudio.src = URL.createObjectURL(audioBlob);
                 elements.recordedAudio.controls = true; // 👈 Enables the audio player controls
                 elements.recordedAudio.style.display = 'block'; // 👈 Ensure it's visible
@@ -102,10 +104,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Timer
             let seconds = 0;
-            recordingInterval = setInterval(() => {
-                elements.recordTimer.textContent = `Recording: ${++seconds}s`;
-                if (seconds >= MAX_RECORD_TIME) stopRecording();
-            }, 1000);
+                recordingInterval = setInterval(() => {
+                    seconds++;
+                    const minutes = Math.floor(seconds / 60);
+                    elements.recordTimer.textContent = `Recording: ${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+
+                    if (seconds >= MAX_RECORD_TIME) stopRecording();
+                }, 1000);
+
 
         } catch (error) {
             showError('Microphone access required for recording');
@@ -113,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const stopRecording = () => {
-        if (mediaRecorder) mediaRecorder.stop();
+        if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
         cleanupMedia();
         clearInterval(recordingInterval);
         resetUI();
@@ -164,13 +170,16 @@ document.addEventListener("DOMContentLoaded", function () {
             showError('No audio file selected!');
             return;
         }
-
+    
+        const model = document.getElementById("model-select").value;
+    
         const formData = new FormData();
-        formData.append("audio", uploadedFile, "audio.wav");
-
+        formData.append("audio", uploadedFile, uploadedFile.name);
+        formData.append("model", model); // ⬅️ Include the selected model
+        console.log("Selected model:", model);
         showElement(elements.processingSection);
         elements.processingStatus.textContent = "🎵 Extracting features...";
-
+    
         try {
             const response = await fetch("/predict", {
                 method: "POST",
@@ -179,11 +188,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: formData
             });
-
+    
             if (!response.ok) throw new Error("Prediction failed");
-
+    
             const results = await response.json();
-            localStorage.setItem("analysisResults", JSON.stringify(results)); // Replaced sessionStorage with localStorage
+            localStorage.setItem("analysisResults", JSON.stringify(results));
             window.location.href = "/results";
         } catch (error) {
             console.error(error);
@@ -191,6 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => window.location.href = "/error", 2000);
         }
     };
+    
 
     // Results Page Logic
     if (window.location.pathname === "/results") {
@@ -222,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
     elements.stopBtn.addEventListener("click", stopRecording);
     elements.cancelBtn.addEventListener("click", cancelRecording);
     elements.analyzeBtn.addEventListener("click", analyzeAudio);
-
+    
     // Drag & Drop Handlers
     ['dragenter', 'dragover'].forEach(event => {
         elements.dropArea.addEventListener(event, e => {

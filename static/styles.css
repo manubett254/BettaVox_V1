@@ -240,6 +240,47 @@ nav a:focus {
     outline-offset: 2px;
 }
 
+.model-select {
+    margin: 1em 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    color: #ffffff;
+}
+
+.model-select select {
+    padding: 0.6em 1em;
+    background-color: #003333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: inherit;
+    appearance: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.model-select select:hover,
+.model-select select:focus {
+    background-color: #004d4d;
+    outline: none;
+}
+
+.model-select select option {
+    background-color: #003333;
+    color: white;
+}
+
+/* Optional: custom dropdown arrow for better style */
+.model-select select {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='14' height='10' viewBox='0 0 14 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23ffffff' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1em center;
+    background-size: 0.65em auto;
+}
+
 /* Footer */
 footer {
     text-align: center;
