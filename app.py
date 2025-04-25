@@ -4,9 +4,9 @@ from werkzeug.utils import secure_filename
 from extract import extract_features
 import os
 import json
-import pandas as pd  # Added for DataFrame operations
-import logging  # Added for logging
-import numpy as np  # Import NumPy for handling float32
+import pandas as pd
+import logging
+import numpy as np
 import sqlite3
 
 # Configure logging
@@ -70,7 +70,11 @@ init_db()
 init_corrections_db()
 
 # Load models
-MODELS, SCALER_GENDER, FEATURE_LIST, AGE_MODEL, SCALER_AGE, LABEL_ENCODER = load_assets()
+(
+    GENDER_MODELS, SCALER_GENDER, FEATURE_LIST,
+    MODEL_STEP1, SCALER_STEP1, LABEL_ENCODER_STEP1,
+    MODEL_STEP2, SCALER_STEP2, LABEL_ENCODER_STEP2
+) = load_assets()
 
 def allowed_file(filename):
     return filename.lower().endswith(tuple(ALLOWED_EXTENSIONS))
@@ -98,16 +102,17 @@ def error():
 @app.route("/predict", methods=["POST"])
 def predict():
     file = request.files.get("audio")
-    model_type = request.form.get("model", "svm")
+    model_type = request.form.get("model", "svm")  # Default to 'svm'
     logging.info(f"📥 Received model: {model_type}")
     
-    
-    if model_type not in MODELS:
+    if model_type not in GENDER_MODELS:
         logging.error("Invalid model type provided")
         return jsonify({"error": "Invalid model type. Choose 'svm' or 'lr'"}), 400
+    
     if not file or file.filename == "":
         logging.error("No valid file uploaded")
         return jsonify({"error": "No valid file uploaded"}), 400
+    
     if allowed_file(file.filename):
         filepath = os.path.join(app.config["UPLOAD_FOLDER"], secure_filename(file.filename))
         file.save(filepath)
@@ -118,34 +123,48 @@ def predict():
             logging.info("Feature extraction completed.")
             logging.info(f"✅ Features successfully extracted and formatted (Total: {len(features)} features)")
             
-            # Convert features to a dictionary for serialization
-            features_dict = {f"feature_{i}": float(feature) for i, feature in enumerate(features)}
-            features_serialized = json.dumps(features_dict)
-            
+            # Convert features to a DataFrame for scaling
             features_df = pd.DataFrame([features], columns=FEATURE_LIST)
+            
+            # Step 1: Predict Gender
             features_scaled_gender = SCALER_GENDER.transform(features_df)
-            gender_prediction = MODELS[model_type].predict(features_scaled_gender)[0]
-            logging.info(f"🔍 Model selected: {model_type.upper()}")
-            gender_confidence = MODELS[model_type].predict_proba(features_scaled_gender)[0]
+            gender_prediction = GENDER_MODELS[model_type].predict(features_scaled_gender)[0]
             gender_label = "Female" if gender_prediction == 1 else "Male"
+            gender_confidence = GENDER_MODELS[model_type].predict_proba(features_scaled_gender)[0]
             gender_confidence_score = float(max(gender_confidence)) * 100
+            
+            # Append gender as a new feature
             features_df["gender"] = gender_prediction
-            features_scaled_age = SCALER_AGE.transform(features_df)
-            age_prediction = AGE_MODEL.predict(features_scaled_age)[0]
-            age_group = LABEL_ENCODER.inverse_transform([age_prediction])[0]
+            
+            # Step 2: Predict Age (Step 1: Child vs Non-Child)
+            features_scaled_step1 = SCALER_STEP1.transform(features_df)
+            step1_pred_encoded = MODEL_STEP1.predict(features_scaled_step1)[0]
+            step1_pred = LABEL_ENCODER_STEP1.inverse_transform([step1_pred_encoded])[0]
+            
+            if step1_pred == 'child':
+                age_group = 'child'
+                confidence_score = MODEL_STEP1.predict_proba(features_scaled_step1)[0].max() * 100
+            else:
+                # Step 3: Predict Age (Step 2: Teen vs Adult)
+                features_scaled_step2 = SCALER_STEP2.transform(features_df)
+                step2_pred_encoded = MODEL_STEP2.predict(features_scaled_step2)[0]
+                age_group = LABEL_ENCODER_STEP2.inverse_transform([step2_pred_encoded])[0]
+                confidence_score = MODEL_STEP2.predict_proba(features_scaled_step2)[0].max() * 100
+            
             os.remove(filepath)
             
             # Log prediction details
-            logging.info(f"🟢 Prediction made: Gender={gender_label}, Age Group={age_group}, Confidence={gender_confidence_score:.2f}%")
+            logging.info(f"🟢 Prediction made: Gender={gender_label}, Age Group={age_group}, Confidence={confidence_score:.2f}%")
             
             # Save prediction to database
+            features_serialized = json.dumps({f"feature_{i}": float(feature) for i, feature in enumerate(features)})
             conn = sqlite3.connect('predictions.db')
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO predictions (
                     audio_file, predicted_gender, predicted_age_group, confidence_score, is_correct, features
                 ) VALUES (?, ?, ?, ?, ?, ?)
-            ''', (file.filename, gender_label, age_group, gender_confidence_score, -1, features_serialized))  # -1: Unverified
+            ''', (file.filename, gender_label, age_group, confidence_score, -1, features_serialized))  # -1: Unverified
             prediction_id = cursor.lastrowid
             conn.commit()
             conn.close()
@@ -154,12 +173,15 @@ def predict():
                 "id": prediction_id,
                 "gender": gender_label,
                 "gender_confidence": gender_confidence_score,
-                "age_group": age_group
+                "age_group": age_group,
+                "age_confidence": confidence_score
             }
             return jsonify(results)
+        
         except Exception as e:
             logging.error(f"❌ Error during prediction: {str(e)}")
             return jsonify({"error": f"An error occurred during analysis: {str(e)}"}), 500
+    
     logging.error("Invalid file format uploaded")
     return jsonify({"error": "Invalid file format"}), 400
 
@@ -171,6 +193,7 @@ def feedback():
     corrected_gender = data.get("corrected_gender")
     corrected_age_group = data.get("corrected_age_group")
     user_feedback = data.get("user_feedback")
+    
     if prediction_id is None or is_correct not in [0, 1]:
         return jsonify({"error": "Invalid feedback data"}), 400
     

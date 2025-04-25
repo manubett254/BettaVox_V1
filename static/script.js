@@ -83,17 +83,14 @@ document.addEventListener("DOMContentLoaded", function () {
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
             mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
-                console.log("Uploading file:", uploadedFile.name, uploadedFile.type);
-
-                elements.recordedAudio.src = URL.createObjectURL(audioBlob);
-                elements.recordedAudio.controls = true; // 👈 Enables the audio player controls
-                elements.recordedAudio.style.display = 'block'; // 👈 Ensure it's visible
-                uploadedFile = audioBlob;
-                
-                showElement(elements.recordedAudio);  // 👈 Just in case
-                showElement(elements.analyzeBtn);     // Now this shows only after playback is available
+                console.log("Recorded audio Blob:", audioBlob); // Log the Blob
+                const audioUrl = URL.createObjectURL(audioBlob);
+                elements.recordedAudio.src = audioUrl; // Assign the Blob URL to the audio element
+                elements.recordedAudio.controls = true; // Enable controls
+                elements.recordedAudio.style.display = 'block'; // Make the element visible
+                uploadedFile = audioBlob; // Assign the Blob to uploadedFile
+                console.log("Uploaded file after recording:", uploadedFile); // Confirm assignment
             };
-
             // UI Updates
             hideElement(elements.dropArea);
             showElement(elements.recordingContainer);
@@ -116,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             showError('Microphone access required for recording');
         }
+        
     };
 
     const stopRecording = () => {
@@ -123,6 +121,8 @@ document.addEventListener("DOMContentLoaded", function () {
         cleanupMedia();
         clearInterval(recordingInterval);
         resetUI();
+        showElement(elements.analyzeBtn); // Show the Analyze button
+        showElement(elements.recordedAudio); // Ensure the recorded audio is visible
     };
 
     const cancelRecording = () => {
@@ -146,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showElement(elements.recordBtn);
         showElement(elements.dropArea);
         elements.recordTimer.textContent = '00:00';
+        showElement(elements.analyzeBtn); // Ensure this line is executed
     };
 
     // File Handling
@@ -174,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const model = document.getElementById("model-select").value;
     
         const formData = new FormData();
-        formData.append("audio", uploadedFile, uploadedFile.name);
+        formData.append("audio", uploadedFile, uploadedFile.name || "recorded-audio.wav");
         formData.append("model", model); // ⬅️ Include the selected model
         console.log("Selected model:", model);
         showElement(elements.processingSection);
