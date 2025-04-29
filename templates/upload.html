@@ -4,74 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload | BettaVox</title>
-    <meta name="csrf-token" content="{{ csrf_token }}">
+    <!-- <meta name="csrf-token" content="{{ csrf_token }}"> -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
 
-<header>
-    <h1><a href="{{ url_for('index') }}">BettaVox</a></h1>
-    <nav>
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('upload') }}">Upload</a>
-        <a href="{{ url_for('about') }}">About</a>
-    </nav>
-</header>
-
-<div class="container" id="upload-section">
-    <h2>Upload or Record Your Voice</h2>
-
-    <form id="upload-form" onsubmit="return false;">
-        <!-- Upload Section -->
-        <div id="drop-area">
-            <p>Drag & Drop your audio file here</p>
-            <input type="file" id="file-input" accept="audio/*" hidden required>
-            <button type="button" id="browse-btn" class="btn">Browse</button>
-            <p id="file-info"></p>
+    <!-- Header -->
+    <header class="glass-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">BettaVox</a>
+            </div>
+            <nav class="nav">
+                <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('upload') }}" class="nav-link active">Analyze</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" aria-label="Toggle dark mode">
+                    <span class="theme-icon">🌓</span>
+                </button>
+            </div>
         </div>
+    </header>
 
-        <audio id="uploaded-audio" controls class="hidden"></audio>
+    <!-- Main Content -->
+    <main class="upload-container">
+        <div class="container">
+            <div class="upload-header">
+                <h1 class="section-title">Analyze Your Voice</h1>
+                <p class="section-subtitle">Upload or record your voice to discover what it reveals about you</p>
+            </div>
 
-        <!-- Recording Section -->
-        <div id="recording-container">
-            <button type="button" id="record-btn" class="btn">🎤 Start Recording</button>
-            <div id="recording-section" class="hidden">
-                <p id="record-timer">00:00</p>
-                <canvas id="waveform" width="400" height="100"></canvas>
-                <div class="recording-controls">
-                    <button type="button" id="stop-btn" class="btn">⏹ Stop</button>
-                    <button type="button" id="cancel-btn" class="btn">❌ Cancel</button>
+            <div class="upload-options">
+                <!-- Upload Card -->
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3L7 8" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 3V15" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Upload Audio File</h3>
+                    <p>Drag & drop your audio file or browse your device</p>
+                    
+                    <div id="drop-area" class="drop-zone">
+                        <input type="file" id="file-input" accept="audio/*" hidden>
+                        <button id="browse-btn" class="btn secondary-btn">
+                            Select File
+                        </button>
+                        <p id="file-info" class="file-info">No file selected</p>
+                    </div>
+                    
+                    <audio id="uploaded-audio" controls class="hidden audio-player"></audio>
+                </div>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <!-- Record Card -->
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5V12C6.5 15.0376 8.96243 17.5 12 17.5C15.0376 17.5 17.5 15.0376 17.5 12V6.5C17.5 3.46243 15.0376 1 12 1Z" stroke="var(--primary)" stroke-width="2"/>
+                            <path d="M4 10V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V10" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 17V20" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Record Your Voice</h3>
+                    <p>Record directly from your microphone</p>
+                    
+                    <button id="record-btn" class="btn primary-btn record-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                        </svg>
+                        Start Recording
+                    </button>
+                    
+                    <div id="recording-section" class="recording-section hidden">
+                        <div class="recording-visual">
+                            <canvas id="waveform" width="400" height="100"></canvas>
+                            <p id="record-timer">00:00</p>
+                        </div>
+                        <div class="recording-controls">
+                            <button id="stop-btn" class="btn primary-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor"/>
+                                </svg>
+                                Stop
+                            </button>
+                            <button id="cancel-btn" class="btn secondary-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <audio id="recorded-audio" controls class="hidden audio-player"></audio>
                 </div>
             </div>
-            <audio id="recorded-audio" controls class="hidden"></audio>
+
+            <!-- Model Selection -->
+            <div class="model-selection">
+                <label for="model-select">Analysis Model:</label>
+                <select id="model-select" class="model-select">
+                    <option value="svm">Support Vector Machine (SVM)</option>
+                    <option value="lr">Logistic Regression (LR)</option>
+                </select>
+            </div>
+
+            <!-- Analyze Button -->
+            <button id="analyze-btn" class="btn primary-btn large analyze-btn hidden">
+                Analyze Voice
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
         </div>
-        <!-- Model Selection -->
-        <div class="model-select">
-            <label for="model-select">Choose Model:</label>
-            <select id="model-select" class="btn">
-                <option value="svm">Support Vector Machine (SVM)</option>
-                <option value="lr">Logistic Regression (LR)</option>
-            </select>
+    </main>
+
+    Processing Overlay
+    <div id="processing-section" class="processing-overlay hidden">
+        <div class="processing-content">
+            <div class="processing-spinner"></div>
+            <h2>Analyzing Your Voice</h2>
+            <p id="processing-status">Extracting voice features...</p>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+            </div>
         </div>
-
-
-        <button type="button" id="analyze-btn" class="btn hidden">Analyze</button>
-    </form>
-</div>
-
-<!-- Processing Section -->
-<div class="container hidden" id="processing-section">
-    <h2>⏳ Processing...</h2>
-    <div class="progress-bar">
-        <div class="progress"></div>
     </div>
-    <p id="processing-status">Initializing analysis...</p>
-</div>
 
-<footer>
-    <p>&copy; 2025 BettaVox. All Rights Reserved.</p>
-</footer>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <a href="{{ url_for('index') }}" class="footer-logo">BettaVox</a>
+                <p>AI-powered voice analysis</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Navigation</h4>
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('upload') }}">Analyze</a>
+                    <a href="{{ url_for('about') }}">About</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 BettaVox. All rights reserved.</p>
+        </div>
+    </footer>
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

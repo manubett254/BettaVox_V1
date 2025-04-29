@@ -99,6 +99,10 @@ def about():
 def error():
     return render_template('error.html')
 
+@app.route('/static/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory('static/js', filename)
+
 @app.route("/predict", methods=["POST"])
 def predict():
     file = request.files.get("audio")

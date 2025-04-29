@@ -4,46 +4,152 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="BettaVox uses AI to analyze your voice and predict age and gender. Try it now!">
-    <title>BettaVox -<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta name="description" content="BettaVox uses AI to analyze your voice and predict age and gender. Try it now!">
-            <title>BettaVox - Voice Analysis</title>
-            <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-        </head>
-        <body>
-        
-            <!-- Header -->
-            <header class="header">
-                <div class="logo-container">
-                    <h1><a href="{{ url_for('index') }}">BettaVox</a></h1>
-                </div>
-                <nav class="nav">
-                    <a href="{{ url_for('index') }}" class="nav-link">Home</a>
-                    <a href="{{ url_for('upload') }}" class="nav-link">Upload</a>
-                    <a href="{{ url_for('about') }}" class="nav-link">About</a>
-                </nav>
-            </header>
-        
-            <!-- Hero Section -->
-            <section class="index-hero">
-                <div class="hero-content">
-                    <h2>Unlock Insights from Your Voice</h2>
-                    <p>BettaVox analyzes your voice to predict your age and gender using advanced AI technology.</p>
-                    <a href="{{ url_for('upload') }}" class="btn hero-btn">Get Started</a>
-                </div>
-            </section>
-        
-            <!-- Footer -->
-            <footer class="footer">
-                <p>&copy; 2025 BettaVox. All rights reserved.</p>
-            </footer>
-        
-            <script src="{{ url_for('static', filename='script.js') }}"></script>
-        </body>
-        </html> Voice Analysis</title>
+    <!-- <meta name="csrf-token" content="{{ csrf_token() }}"> -->
+    <title>BettaVox - Voice Analysis</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+
+    <!-- Header -->
+    <header class="glass-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">BettaVox</a>
+            </div>
+            <nav class="nav">
+                <a href="{{ url_for('index') }}" class="nav-link active">Home</a>
+                <a href="{{ url_for('upload') }}" class="nav-link">Analyze</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" aria-label="Toggle dark mode">
+                    <span class="theme-icon">🌓</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">Discover What Your <span class="highlight">Voice</span> Reveals</h1>
+                <p class="hero-subtitle">BettaVox analyzes your voice using AI to predict your age and gender with incredible accuracy.</p>
+                <div class="hero-cta">
+                    <a href="{{ url_for('upload') }}" class="btn primary-btn pulse">
+                        <span>Get Started</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="#features" class="btn secondary-btn">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="voice-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+                <div class="floating-avatar">
+                    <div class="avatar-circle"></div>
+                    <div class="avatar-pulse"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">AI-Powered Voice Insights</h2>
+            <p class="section-subtitle">Advanced technology made simple</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5V12C6.5 15.0376 8.96243 17.5 12 17.5C15.0376 17.5 17.5 15.0376 17.5 12V6.5C17.5 3.46243 15.0376 1 12 1Z" stroke="#004d4d" stroke-width="2"/>
+                            <path d="M4 10V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V10" stroke="#004d4d" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 17V20" stroke="#004d4d" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>AI-Powered Insights</h3>
+                    <p>Experience cutting-edge AI voice analysis technology at your fingertips.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#004d4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Quick & Simple</h3>
+                    <p>Upload your voice recording and receive predictions in seconds.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#004d4d" stroke-width="2"/>
+                            <path d="M12 8V12L15 15M16 8H8M16 16H8" stroke="#004d4d" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Privacy First</h3>
+                    <p>Your recordings are processed securely and never stored.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container cta-container">
+            <h2>Ready to Discover Your Voice?</h2>
+            <p>Get started with BettaVox in just a few clicks.</p>
+            <a href="{{ url_for('upload') }}" class="btn primary-btn large">
+                Analyze Your Voice Now
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <a href="{{ url_for('index') }}" class="footer-logo">BettaVox</a>
+                <p>AI-powered voice analysis</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Navigation</h4>
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('upload') }}">Analyze</a>
+                    <a href="{{ url_for('about') }}">About</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 BettaVox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script></body> -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</html>
