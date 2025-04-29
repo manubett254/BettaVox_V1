@@ -4,7 +4,7 @@ export function setupAnalysis() {
         processingSection: document.getElementById("processing-section"),
         processingStatus: document.getElementById("processing-status")
     };
-
+    
     const analyzeAudio = async () => {
         // ... analysis logic ...
         if (!window.uploadedFile) {
@@ -24,9 +24,6 @@ export function setupAnalysis() {
         try {
             const response = await fetch("/predict", {
                 method: "POST",
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
                 body: formData
             });
     

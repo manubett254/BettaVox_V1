@@ -39,11 +39,3 @@ export function setupFileUpload() {
         elements.fileInput?.click());
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    window.uploadedFile = uploadedFile; 
-});
-
-if (!window.helpers) {
-    console.error("Helpers not initialized!");
-    // Optionally initialize defaults or show error
-}

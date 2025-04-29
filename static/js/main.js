@@ -4,92 +4,96 @@ import { setupAnalysis } from './analysis.js';
 import { initResultsPage } from './results.js';
 import { showElement, hideElement, showError, initToastSystem } from './utils.js';
 
-// Initialize global application state
+// Global application state initialization
 const initializeAppState = () => {
-    window.appState = {
-        uploadedFile: null,
-        isProcessing: false,
-        currentModel: 'svm', // Default model
-        helpers: { showElement, hideElement, showError }
-    };
+  window.appState = window.appState || {
+    uploadedFile: null,
+    isProcessing: false,
+    currentModel: 'svm',
+    helpers: { showElement, hideElement, showError }
+  };
 };
 
-document.addEventListener("DOMContentLoaded", function() {
-    try {
-        // Initialize core systems
-        initializeAppState();
-        initToastSystem();
-        
-        // Verify critical elements exist
-        const verifyCriticalElements = () => {
-            const requiredElements = {
-                processingSection: document.getElementById("processing-section"),
-                analyzeBtn: document.getElementById("analyze-btn")
-            };
-            
-            if (window.location.pathname.includes('upload') && !requiredElements.analyzeBtn) {
-                throw new Error("Critical upload page elements missing");
-            }
-            
-            return requiredElements;
-        };
+// Common features available on all pages
+const initCommonFeatures = () => {
+  initToastSystem();
+  initializeAppState();
 
-        const elements = verifyCriticalElements();
-        
-        // Initialize page-specific modules
-        const initializePageModules = () => {
-            const path = window.location.pathname;
-            
-            if (path.includes('upload')) {
-                setupRecording();
-                setupFileUpload();
-                setupAnalysis(); // Explicit initialization for upload page
-                
-                // Set initial UI state
-                hideElement(elements.processingSection);
-            } 
-            else if (path.includes('results')) {
-                initResultsPage();
-            }
-            
-            // Add global event listeners
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'hidden' && window.appState.isProcessing) {
-                    showError("Processing interrupted - page visibility changed");
-                }
-            });
-        };
-
-        initializePageModules();
-
-    } catch (error) {
-        console.error("Application initialization failed:", error);
-        showError("Application failed to load properly");
-        
-        // Fallback error handling
-        setTimeout(() => {
-            if (!window.location.pathname.includes('error')) {
-                window.location.href = '/error';
-            }
-        }, 3000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && window.appState.isProcessing) {
+      showError("Processing interrupted - page visibility changed");
     }
-});
+  });
+};
+
+// Page-specific initializers
+const initUploadPage = () => {
+  const processingSection = document.getElementById("processing-section");
+  const analyzeBtn = document.getElementById("analyze-btn");
+
+  if (!analyzeBtn) {
+    console.warn("Upload page detected, but analyze button missing.");
+    return;
+  }
+
+  console.log("Upload page detected — initializing upload features");
+
+  setupRecording();
+  setupFileUpload();
+  setupAnalysis();
+
+  if (processingSection) {
+    hideElement(processingSection);
+  }
+};
+
+const initResults = () => {
+  initResultsPage();
+};
+
+// Main application initializer
+const initializeApplication = () => {
+  try {
+    initCommonFeatures();
+
+    const path = window.location.pathname.replace(/\/$/, '');
+    if (path.includes('/upload')) {
+      initUploadPage();
+    } else if (path.includes('/results')) {
+      initResults();
+    } else if (path.includes('/about')) {
+      // Optional: About page logic here
+    }
+
+  } catch (error) {
+    console.error("Application initialization failed:", error);
+    showError("Application failed to load properly");
+
+    setTimeout(() => {
+      if (!window.location.pathname.includes('error')) {
+        window.location.href = '/error';
+      }
+    }, 3000);
+  }
+};
 
 // Global error handler
-window.addEventListener('error', function(event) {
-    console.error("Uncaught error:", event.error);
-    showError("An unexpected error occurred");
-    
-    // Send error to server if available
-    if (window.navigator.onLine) {
-        fetch('/log-error', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message: event.error.message,
-                stack: event.error.stack,
-                url: window.location.href
-            })
-        }).catch(e => console.error("Error logging failed:", e));
-    }
+window.addEventListener('error', function (event) {
+  console.error("Uncaught error:", event.error);
+  showError("An unexpected error occurred");
+
+  if (navigator.onLine) {
+    fetch('/log-error', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: event.error.message,
+        stack: event.error.stack,
+        url: window.location.href
+      })
+    }).catch(e => console.error("Error logging failed:", e));
+  }
 });
+
+// Fire when DOM is ready
+document.addEventListener("DOMContentLoaded", initializeApplication);
