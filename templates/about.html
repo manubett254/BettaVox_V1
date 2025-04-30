@@ -3,76 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn more about BettaVox, the AI-powered voice analysis tool.">
     <title>About BettaVox</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
 
     <!-- Header -->
-    <header class="header">
-        <div class="logo-container">
-            <h1><a href="{{ url_for('index') }}">BettaVox</a></h1>
+    <header class="glass-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">BettaVox</a>
+            </div>
+            <nav class="nav">
+                <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('upload') }}" class="nav-link">Analyze</a>
+                <a href="{{ url_for('about') }}" class="nav-link active">About</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" aria-label="Toggle dark mode">
+                    <span class="theme-icon">🌓</span>
+                </button>
+            </div>
         </div>
-        <nav class="nav">
-            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
-            <a href="{{ url_for('upload') }}" class="nav-link">Upload</a>
-            <a href="{{ url_for('about') }}" class="nav-link active">About</a>
-        </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <h2>Discover BettaVox</h2>
-            <p>BettaVox is an advanced AI-powered system that analyzes voice characteristics to predict age and gender with remarkable accuracy.</p>
-            <a href="{{ url_for('upload') }}" class="btn hero-btn">Try It Now</a>
-        </div>
-        <div class="hero-image">
-            <img src="{{ url_for('static', filename='images/voice-analysis.svg') }}" alt="Voice Analysis Illustration">
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section">
-        <h2>How BettaVox Works</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <h3>Upload Your Voice</h3>
-                <p>Simply upload or record your voice sample through our intuitive interface.</p>
+    <!-- Main Content -->
+    <main class="about-container">
+        <div class="container">
+            <div class="hero">
+                <h1 class="section-title">About BettaVox</h1>
+                <p class="section-subtitle">Discover the technology behind voice analysis</p>
             </div>
-            <div class="feature-card">
-                <h3>Extract Key Features</h3>
-                <p>Our AI extracts over 50 features from your audio, including pitch, tone, and spectral characteristics.</p>
+
+            <div class="glass-card">
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 7L12 17L4 7" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Advanced AI Models</h3>
+                        <p>Combining SVM and Random Forest algorithms for optimal prediction accuracy</p>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <div class="tech-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--primary)" stroke-width="2"/>
+                                <path d="M16 8H8V16" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Feature Extraction</h3>
+                        <p>Analyzing 50+ acoustic features including MFCC, pitch, and spectral contrast</p>
+                    </div>
+                </div>
+
+                <div class="process-steps">
+                    <div class="process-card">
+                        <div class="step-number">1</div>
+                        <h4>Voice Input</h4>
+                        <p>Upload or record your voice sample</p>
+                    </div>
+                    <div class="process-arrow">→</div>
+                    <div class="process-card">
+                        <div class="step-number">2</div>
+                        <h4>Feature Analysis</h4>
+                        <p>Extract key vocal characteristics</p>
+                    </div>
+                    <div class="process-arrow">→</div>
+                    <div class="process-card">
+                        <div class="step-number">3</div>
+                        <h4>AI Prediction</h4>
+                        <p>Generate age & gender prediction</p>
+                    </div>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>Predict Age & Gender</h3>
-                <p>Using machine learning models trained on extensive datasets, we predict your age group and gender.</p>
+
+            <div class="cta-section">
+                <h2>Ready to Try BettaVox?</h2>
+                <a href="{{ url_for('upload') }}" class="btn primary-btn large">
+                    Start Analysis
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
             </div>
         </div>
-    </section>
-
-    <!-- Benefits Section -->
-    <section class="benefits-section">
-        <h2>Why Choose BettaVox?</h2>
-        <ul class="benefits-list">
-            <li>Accurate predictions powered by state-of-the-art AI.</li>
-            <li>User-friendly interface for seamless interaction.</li>
-            <li>Privacy-focused: Your data is never stored or shared.</li>
-            <li>Fast and efficient processing for real-time results.</li>
-        </ul>
-    </section>
-
-    <!-- Call-to-Action Section -->
-    <section class="cta-section">
-        <h2>Ready to Experience BettaVox?</h2>
-        <p>Unlock the power of voice analysis today!</p>
-        <a href="{{ url_for('upload') }}" class="btn cta-btn">Get Started</a>
-    </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2025 BettaVox. All rights reserved.</p>
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <a href="{{ url_for('index') }}" class="footer-logo">BettaVox</a>
+                <p>AI-powered voice analysis</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Navigation</h4>
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('upload') }}">Analyze</a>
+                    <a href="{{ url_for('about') }}">About</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 BettaVox. All rights reserved.</p>
+        </div>
     </footer>
 
     <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>

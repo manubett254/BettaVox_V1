@@ -1,5 +1,9 @@
 import { showElement, hideElement, showError } from "./utils.js";
 
+if (!MediaRecorder.prototype.start && MediaRecorder.prototype.startRecording) {
+  MediaRecorder.prototype.start = MediaRecorder.prototype.startRecording;
+  MediaRecorder.prototype.stop = MediaRecorder.prototype.stopRecording;
+}
 export function setupRecording() {
   const elements = {
     recordBtn: document.getElementById("record-btn"),
@@ -19,6 +23,12 @@ export function setupRecording() {
 
   const setupWaveform = () => {
     const ctx = elements.waveformCanvas.getContext('2d');
+    const width = elements.waveformCanvas.offsetWidth;
+    const height = elements.waveformCanvas.offsetHeight;
+     // Set actual canvas size
+    elements.waveformCanvas.width = width;
+    elements.waveformCanvas.height = height;
+    
     ctx.clearRect(0, 0, elements.waveformCanvas.width, elements.waveformCanvas.height);
     const draw = () => {
       if (!analyser) return;
@@ -48,12 +58,26 @@ export function setupRecording() {
 
   const startRecording = async () => {
     try {
-      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 
+            'audio/webm; codecs=opus' : 
+            'audio/mp4';
+            audioStream = await navigator.mediaDevices.getUserMedia({ 
+              audio: {
+                  channelCount: 1,
+                  sampleRate: 16000,
+                  sampleSize: 16
+              }
+          });  
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
       const source = audioContext.createMediaStreamSource(audioStream);
       source.connect(analyser);
-      mediaRecorder = new MediaRecorder(audioStream);
+      mediaRecorder = new MediaRecorder(audioStream, { mimeType });
+       // Add error handling for Edge
+       mediaRecorder.onerror = (e) => {
+        showError(`Recording error: ${e.error.name}`);
+        cleanupMedia();
+    };
       const audioChunks = [];
       mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
       mediaRecorder.onstop = () => {
@@ -79,9 +103,15 @@ export function setupRecording() {
       }, 1000);
 
     } catch (error) {
-      showError('Microphone access required for recording');
-    }
-  };
+      // Improved error messages
+      const errorMap = {
+          'NotAllowedError': 'Microphone access denied. Please enable permissions.',
+          'NotFoundError': 'No microphone found.',
+          'NotReadableError': 'Microphone is already in use.'
+      };
+      showError(errorMap[error.name] || 'Recording failed. Please try again.');
+  }
+};
 
   const stopRecording = () => {
     if (mediaRecorder?.state === "recording") mediaRecorder.stop();
