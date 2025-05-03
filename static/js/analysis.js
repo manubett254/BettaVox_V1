@@ -1,3 +1,5 @@
+import { showElement, hideElement, showError } from "./utils.js";
+
 export function setupAnalysis() {
     const elements = {
         analyzeBtn: document.getElementById("analyze-btn"),
@@ -33,13 +35,15 @@ export function setupAnalysis() {
             localStorage.setItem("analysisResults", JSON.stringify(results));
             window.location.href = "/results";
         } catch (error) {
-            console.error(error);
-            elements.processingStatus.textContent = "❌ Error processing audio";
-            setTimeout(() => window.location.href = "/error", 2000);
+            console.error("Analysis failed:", error);
+            showError("Analysis failed. Please try again.");
+            elements.processingStatus.textContent = "❌ Error processing audio"; setTimeout(() => window.location.href = "/error", 2000);
         }
     };
 
-    elements.analyzeBtn?.addEventListener('click', analyzeAudio);
+    
+     elements.analyzeBtn.addEventListener('click', analyzeAudio);
+     console.log("Analyze button event listener attached");
 }
 
 if (!window.helpers) {

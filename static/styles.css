@@ -681,6 +681,14 @@ body {
     transform: scale(1.08) translateY(-2px);
 }
 
+.analyze-btn.hidden {
+    display: none;
+  }
+
+.analyze-btn:not(.hidden) {
+    display: inline-flex !important;
+  }
+
 /* Processing Overlay */
 .processing-overlay {
     display: none;

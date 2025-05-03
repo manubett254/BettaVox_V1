@@ -28,20 +28,17 @@ const initCommonFeatures = () => {
 
 // Page-specific initializers
 const initUploadPage = () => {
-  const processingSection = document.getElementById("processing-section");
-  const analyzeBtn = document.getElementById("analyze-btn");
-
-  if (!analyzeBtn) {
-    console.warn("Upload page detected, but analyze button missing.");
-    return;
-  }
-
-  console.log("Upload page detected — initializing upload features");
-
-  setupRecording();
+  initializeAppState();
+  initCommonFeatures();
+  
+  console.log("Initializing upload page features...");
+  
+  // Initialize modules
   setupFileUpload();
-  setupAnalysis();
+  setupRecording();
+  setupAnalysis();  // This should come after the other two
 
+  const processingSection = document.getElementById("processing-section");
   if (processingSection) {
     hideElement(processingSection);
   }
