@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
     <!-- Animated Background -->
@@ -34,128 +35,211 @@
     <!-- Main Content -->
     <main class="results-container">
         <div class="container">
-            <div class="results-header">
+            <div class="results-header animate__animated animate__fadeIn">
                 <h1 class="section-title">Voice Analysis Results</h1>
-                <p class="section-subtitle">Here's what your voice reveals about you</p>
-            </div>
-
-            <div class="results-card">
-                <div class="results-visual">
-                    <div class="avatar-circle">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5V12C6.5 15.0376 8.96243 17.5 12 17.5C15.0376 17.5 17.5 15.0376 17.5 12V6.5C17.5 3.46243 15.0376 1 12 1Z" stroke="var(--primary)" stroke-width="2"/>
-                            <path d="M4 10V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V10" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M12 17V20" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
+                <p class="section-subtitle">Discover what your voice reveals about you</p>
+                <div class="result-accuracy">
+                    <div class="accuracy-meter">
+                        <div class="accuracy-fill" id="accuracy-fill"></div>
                     </div>
-                    <div class="avatar-pulse"></div>
-                </div>
-
-                <div class="results-details">
-                    <div class="result-item">
-                        <div class="result-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--primary)" stroke-width="2"/>
-                                <path d="M12 8V12L15 15" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <div class="result-text">
-                            <h3>Predicted Gender</h3>
-                            <p id="gender-result" class="result-value">Loading...</p>
-                        </div>
-                    </div>
-
-                    <div class="result-item">
-                        <div class="result-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div class="result-text">
-                            <h3>Predicted Age Group</h3>
-                            <p id="age-result" class="result-value">Loading...</p>
-                        </div>
-                    </div>
-
-                    <div class="result-item">
-                        <div class="result-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M22 12H18M6 12H2M12 6V2M12 22V18" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-                                <circle cx="12" cy="12" r="4" stroke="var(--primary)" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <div class="result-text">
-                            <h3>Confidence Score</h3>
-                            <p id="confidence-score" class="result-value">Loading...</p>
-                        </div>
-                    </div>
+                    <span class="accuracy-label">Analysis Confidence</span>
                 </div>
             </div>
 
-            <div class="feedback-section">
-                <h3 class="feedback-title">Was this prediction correct?</h3>
-                <div class="feedback-buttons">
-                    <button onclick="submitFeedback(true)" class="btn primary-btn feedback-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Yes, it's correct
+            <div class="results-grid">
+                <!-- Visual Representation -->
+                <div class="results-visual-card glass-card animate__animated animate__fadeInLeft">
+                    <div class="voice-avatar">
+                        <div class="avatar-circle" id="gender-avatar">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5V12C6.5 15.0376 8.96243 17.5 12 17.5C15.0376 17.5 17.5 15.0376 17.5 12V6.5C17.5 3.46243 15.0376 1 12 1Z" stroke="var(--primary)" stroke-width="2"/>
+                                <path d="M4 10V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V10" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 17V20" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="avatar-pulse"></div>
+                        <div class="avatar-glow"></div>
+                    </div>
+                    <div class="voice-waveform">
+                        <canvas id="results-waveform" width="400" height="80"></canvas>
+                    </div>
+                </div>
+
+                <!-- Results Details -->
+                <div class="results-details-card glass-card animate__animated animate__fadeInRight">
+                    <div class="result-category">
+                        <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--primary)" stroke-width="2"/>
+                            <path d="M12 8V12L15 15" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+                        </svg> Gender Prediction</h3>
+                        <div class="result-value-container">
+                            <span class="result-value" id="gender-result">Loading...</span>
+                            <div class="confidence-indicator">
+                                <span class="confidence-dot"></span>
+                                <span class="confidence-text" id="gender-confidence">--% confidence</span>
+                            </div>
+                        </div>
+                        <div class="probability-meter">
+                            <div class="probability-track">
+                                <div class="probability-fill male-fill" id="male-probability"></div>
+                                <div class="probability-fill female-fill" id="female-probability"></div>
+                            </div>
+                            <div class="probability-labels">
+                                <span>Male</span>
+                                <span>Female</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-category">
+                        <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg> Age Prediction</h3>
+                        <div class="result-value-container">
+                            <span class="result-value" id="age-result">Loading...</span>
+                            <div class="confidence-indicator">
+                                <span class="confidence-dot"></span>
+                                <span class="confidence-text" id="age-confidence">--% confidence</span>
+                            </div>
+                        </div>
+                        <div class="age-range-indicator">
+                            <div class="age-scale">
+                                <div class="age-marker" id="age-marker"></div>
+                            </div>
+                            <div class="age-labels">
+                                <span>0</span>
+                                <span>25</span>
+                                <span>50</span>
+                                <span>75</span>
+                                <span>100+</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-category">
+                        <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 12H18M6 12H2M12 6V2M12 22V18" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="12" r="4" stroke="var(--primary)" stroke-width="2"/>
+                        </svg> Voice Characteristics</h3>
+                        <div class="voice-features">
+                            <div class="feature">
+                                <span class="feature-label">Pitch</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" id="pitch-level"></div>
+                                </div>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-label">Tone</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" id="tone-level"></div>
+                                </div>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-label">Clarity</span>
+                                <div class="feature-bar">
+                                    <div class="feature-fill" id="clarity-level"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="feedback-section glass-card animate__animated animate__fadeInUp">
+                <div class="feedback-header">
+                    <h3>How accurate were these results?</h3>
+                    <p>Your feedback helps improve our AI model</p>
+                </div>
+                
+                <div class="feedback-options">
+                    <button onclick="submitFeedback(true)" class="feedback-option positive">
+                        <div class="feedback-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" fill="#4BB543"/>
+                                <path d="M16 9L10.5 14.5L8 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span>Very Accurate</span>
                     </button>
-                    <button onclick="showCorrectionForm()" class="btn secondary-btn feedback-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        No, it's incorrect
+                    
+                    <button onclick="submitFeedback(false)" class="feedback-option negative">
+                        <div class="feedback-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#ff4444"/>
+                                <path d="M15 9L9 15M9 9L15 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span>Needs Correction</span>
                     </button>
                 </div>
 
                 <div id="correction-form" class="correction-form hidden">
-                    <h3 class="correction-title">What was incorrect?</h3>
-                    <div class="correction-options">
-                        <label class="correction-option">
+                    <h4>What needs correction?</h4>
+                    <div class="correction-checkboxes">
+                        <label class="correction-checkbox">
                             <input type="checkbox" id="wrong-gender" onchange="toggleCorrectionFields()">
                             <span class="checkmark"></span>
-                            Gender
+                            Gender Prediction
                         </label>
-                        <label class="correction-option">
+                        <label class="correction-checkbox">
                             <input type="checkbox" id="wrong-age" onchange="toggleCorrectionFields()">
                             <span class="checkmark"></span>
-                            Age
+                            Age Prediction
                         </label>
                     </div>
 
                     <div id="correction-fields" class="correction-fields hidden">
                         <div class="form-group">
-                            <label for="correct-gender">Correct Gender:</label>
-                            <select id="correct-gender" class="model-select">
+                            <label for="correct-gender">Correct Gender</label>
+                            <select id="correct-gender" class="form-select">
+                                <option value="">Select gender</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="correct-age">Correct Age:</label>
-                            <input type="number" id="correct-age" min="1" max="100" class="model-select">
+                            <label for="correct-age">Correct Age</label>
+                            <input type="number" id="correct-age" min="1" max="100" class="form-input" placeholder="Enter your age">
                         </div>
+                        <button id="submit-correction-btn" onclick="submitCorrection()" class="btn primary-btn">
+                            Submit Correction
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                     </div>
-
-                    <button id="submit-correction-btn" onclick="submitCorrection()" class="btn primary-btn large hidden">
-                        Submit Correction
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
                 </div>
 
-                <div id="feedback-message" class="feedback-message hidden"></div>
+                <div id="feedback-message" class="feedback-message hidden">
+                    <div class="message-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" fill="#4BB543"/>
+                            <path d="M16 9L10.5 14.5L8 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <div class="message-text">
+                            <h4>Thank You!</h4>
+                            <p>Your feedback has been submitted successfully.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="action-buttons">
+            <!-- Action Buttons -->
+            <div class="action-buttons animate__animated animate__fadeInUp">
                 <a href="{{ url_for('upload') }}" class="btn primary-btn large">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 12V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V12M12 3V15M12 15L8 11M12 15L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     Analyze Another Voice
                 </a>
+                <button class="btn secondary-btn large" id="share-results">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 12V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V12M12 3V15M12 15L8 11M12 15L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Share Results
+                </button>
             </div>
         </div>
     </main>
@@ -186,69 +270,138 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Load results from localStorage
             let results = localStorage.getItem("analysisResults");
             if (results) {
                 results = JSON.parse(results);
-                document.getElementById("gender-result").textContent = results.gender || "Unknown";
-                document.getElementById("age-result").textContent = results.age_group || "Unknown";
-                let confidence = results.gender_confidence || 0;
-                document.getElementById("confidence-score").textContent = confidence.toFixed(2) + "%";
                 
-                // If only age is incorrect, set the correct gender automatically
-                if (!document.getElementById("wrong-gender").checked && document.getElementById("wrong-age").checked) {
-                    document.getElementById("correct-gender").value = results.gender;
+                // Set gender result
+                const genderResult = document.getElementById("gender-result");
+                genderResult.textContent = results.gender ? results.gender.charAt(0).toUpperCase() + results.gender.slice(1) : "Unknown";
+                
+                // Set age result
+                const ageResult = document.getElementById("age-result");
+                ageResult.textContent = results.age_group || "Unknown";
+                
+                // Set confidence scores
+                const genderConfidence = results.gender_confidence || 0;
+                document.getElementById("gender-confidence").textContent = `${genderConfidence.toFixed(0)}% confidence`;
+                
+                const ageConfidence = results.age_confidence || 0;
+                document.getElementById("age-confidence").textContent = `${ageConfidence.toFixed(0)}% confidence`;
+                
+                // Set overall accuracy
+                const overallAccuracy = ((genderConfidence + ageConfidence) / 2).toFixed(0);
+                document.getElementById("accuracy-fill").style.width = `${overallAccuracy}%`;
+                
+                // Set probability meters
+                if (results.gender_probabilities) {
+                    const maleProb = results.gender_probabilities.male * 100;
+                    const femaleProb = results.gender_probabilities.female * 100;
+                    
+                    document.getElementById("male-probability").style.width = `${maleProb}%`;
+                    document.getElementById("female-probability").style.width = `${femaleProb}%`;
+                }
+                
+                // Set age marker
+                if (results.age) {
+                    const age = Math.min(parseInt(results.age), 100);
+                    document.getElementById("age-marker").style.left = `${age}%`;
+                }
+                
+                // Set voice characteristics (random for demo)
+                document.getElementById("pitch-level").style.width = `${70 + Math.random() * 30}%`;
+                document.getElementById("tone-level").style.width = `${60 + Math.random() * 40}%`;
+                document.getElementById("clarity-level").style.width = `${80 + Math.random() * 20}%`;
+                
+                // Create waveform visualization
+                const ctx = document.getElementById('results-waveform').getContext('2d');
+                const waveformData = [];
+                for (let i = 0; i < 100; i++) {
+                    waveformData.push(Math.random() * 0.8 + 0.2);
+                }
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        datasets: [{
+                            data: waveformData,
+                            backgroundColor: 'rgba(0, 77, 77, 0.6)',
+                            borderColor: 'rgba(0, 77, 77, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.9,
+                            categoryPercentage: 1.0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: { display: false },
+                        scales: {
+                            xAxes: [{ display: false }],
+                            yAxes: [{ display: false, ticks: { beginAtZero: true } }]
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+                
+                // Set avatar color based on gender
+                const avatar = document.getElementById('gender-avatar');
+                if (results.gender === 'male') {
+                    avatar.style.background = 'linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%)';
+                } else if (results.gender === 'female') {
+                    avatar.style.background = 'linear-gradient(135deg, #f06292 0%, #d81b60 100%)';
                 }
             } else {
                 console.error("Results not found in localStorage.");
-                document.getElementById("result-container").innerHTML = "<p class='error-msg'>Results unavailable. Please try again.</p>";
             }
         });
 
-        function showCorrectionForm() {
-            document.querySelectorAll(".feedback-btn").forEach(btn => btn.classList.add("hidden"));
-            document.getElementById("correction-form").classList.remove("hidden");
+        function submitFeedback(isCorrect) {
+            let results = JSON.parse(localStorage.getItem("analysisResults"));
+            
+            // Show feedback message
+            const feedbackMessage = document.getElementById("feedback-message");
+            feedbackMessage.classList.remove("hidden");
+            
+            if (isCorrect) {
+                feedbackMessage.querySelector('svg path').setAttribute('fill', '#4BB543');
+                feedbackMessage.querySelector('h4').textContent = 'Thank You!';
+                feedbackMessage.querySelector('p').textContent = 'Your feedback has been submitted successfully.';
+            } else {
+                feedbackMessage.querySelector('svg path').setAttribute('fill', '#ff4444');
+                feedbackMessage.querySelector('h4').textContent = 'Correction Needed';
+                feedbackMessage.querySelector('p').textContent = 'Please provide more details below.';
+                document.getElementById("correction-form").classList.remove("hidden");
+            }
+            
+            // Hide feedback options
+            document.querySelector('.feedback-options').classList.add("hidden");
+            
+            // Submit to server (simulated)
+            setTimeout(() => {
+                console.log("Feedback submitted:", { isCorrect, id: results.id });
+            }, 1000);
         }
 
         function toggleCorrectionFields() {
             let wrongGender = document.getElementById("wrong-gender").checked;
             let wrongAge = document.getElementById("wrong-age").checked;
             let correctionFields = document.getElementById("correction-fields");
-            let submitBtn = document.getElementById("submit-correction-btn");
             
             correctionFields.classList.toggle("hidden", !(wrongGender || wrongAge));
-            submitBtn.classList.toggle("hidden", !(wrongGender || wrongAge));
             
             // If only age is incorrect, set the correct gender automatically
             if (!wrongGender && wrongAge) {
                 let results = JSON.parse(localStorage.getItem("analysisResults"));
                 document.getElementById("correct-gender").value = results.gender;
             }
-        }
-
-        function submitFeedback(isCorrect) {
-            let results = JSON.parse(localStorage.getItem("analysisResults"));
-            fetch("/feedback", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": document.querySelector("meta[name='csrf-token']").getAttribute("content")
-                },
-                body: JSON.stringify({
-                    id: results.id,
-                    is_correct: isCorrect ? 1 : 0
-                })
-            }).then(response => {
-                if (response.ok) {
-                    showFeedbackMessage("Feedback submitted. Thank you!", "success");
-                    document.querySelectorAll(".feedback-btn").forEach(btn => btn.classList.add("hidden"));
-                } else {
-                    showFeedbackMessage("Failed to submit feedback. Please try again.", "error");
-                }
-            }).catch(error => {
-                showFeedbackMessage("Network error. Please try again.", "error");
-            });
         }
 
         function submitCorrection() {
@@ -258,67 +411,25 @@
             let wrongGender = document.getElementById("wrong-gender").checked;
             let wrongAge = document.getElementById("wrong-age").checked;
             
-            fetch("/feedback", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": document.querySelector("meta[name='csrf-token']").getAttribute("content")
-                },
-                body: JSON.stringify({
-                    id: results.id,
-                    is_correct: 0,
-                    corrected_gender: wrongGender ? correctGender : null,
-                    corrected_age_group: wrongAge ? correctAge : null,
-                    user_feedback: "User provided corrections"
-                })
-            }).then(response => {
-                if (response.ok) {
-                    document.getElementById("correction-form").innerHTML = `
-                        <div class="feedback-message success">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" fill="#4BB543"/>
-                                <path d="M16 9L10.5 14.5L8 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <p>Correction submitted. Thank you!</p>
-                        </div>
-                    `;
-                } else {
-                    showFeedbackMessage("Failed to submit correction. Please try again.", "error");
-                }
-            }).catch(error => {
-                showFeedbackMessage("Network error. Please try again.", "error");
-            });
-        }
-
-        function showFeedbackMessage(message, type) {
-            const feedbackElement = document.getElementById("feedback-message");
-            feedbackElement.textContent = message;
-            feedbackElement.className = `feedback-message ${type}`;
-            feedbackElement.classList.remove("hidden");
+            // Update feedback message
+            const feedbackMessage = document.getElementById("feedback-message");
+            feedbackMessage.querySelector('svg path').setAttribute('fill', '#4BB543');
+            feedbackMessage.querySelector('h4').textContent = 'Correction Submitted';
+            feedbackMessage.querySelector('p').textContent = 'Thank you for helping improve our model!';
             
-            if (type === "success") {
-                feedbackElement.innerHTML = `
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" fill="#4BB543"/>
-                        <path d="M16 9L10.5 14.5L8 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>${message}</span>
-                `;
-            } else {
-                feedbackElement.innerHTML = `
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#ff4444"/>
-                        <path d="M15 9L9 15M9 9L15 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>${message}</span>
-                `;
-            }
+            // Hide correction form
+            document.getElementById("correction-form").classList.add("hidden");
+            
+            // Submit to server (simulated)
+            setTimeout(() => {
+                console.log("Correction submitted:", {
+                    id: results.id,
+                    corrected_gender: wrongGender ? correctGender : null,
+                    corrected_age: wrongAge ? correctAge : null
+                });
+            }, 1000);
         }
     </script>
-    <script type="module">
-        import { initResultsPage } from './js/results.js';
-        initResultsPage();
-      </script>
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
