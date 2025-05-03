@@ -1,8 +1,3 @@
-// Ensure DOM is fully loaded before setting up event listeners
-document.addEventListener('DOMContentLoaded', () => {
-    setupFileUpload();
-});
-
 export function setupFileUpload() {
     const elements = {
         fileInput: document.getElementById("file-input"),
@@ -13,32 +8,11 @@ export function setupFileUpload() {
         recordingContainer: document.getElementById("recording-container")
     };
 
-    // Helper functions to hide/show elements
-    function showElement(el) {
-        if (el) {
-            el.classList.remove("hidden");
-            el.style.display = "";
-        }
-    }
+    // Helper functions
+    const showElement = (el) => el?.classList?.remove("hidden");
+    const hideElement = (el) => el?.classList?.add("hidden");
 
-    function hideElement(el) {
-        if (el) {
-            el.classList.add("hidden");
-            el.style.display = "none";
-        }
-    }
-
-    // Handle file upload
-    const handleFileUpload = (event) => {
-        let file;
-
-        // Check if it's a drag/drop or input change event
-        if (event.dataTransfer) {
-            file = event.dataTransfer.files[0];
-        } else {
-            file = event.target.files?.[0] || null;
-        }
-
+    const handleFileSelection = (file) => {
         if (!file) {
             console.warn("No file selected.");
             return;
@@ -46,62 +20,65 @@ export function setupFileUpload() {
 
         const validTypes = ["audio/wav", "audio/mpeg", "audio/ogg", "audio/mp4"];
         if (!validTypes.includes(file.type)) {
-            alert("Unsupported file type. Please use WAV, MP3, or OGG.");
+            alert("Please upload WAV, MP3, or OGG files only");
             return;
         }
 
-        // Store file globally if needed
+        console.log("File selected:", file.name);
         window.uploadedFile = file;
-
-        // Set audio source
         elements.uploadedAudio.src = URL.createObjectURL(file);
         showElement(elements.uploadedAudio);
-
-        // Hide recording section
         hideElement(elements.recordingContainer);
-
-        // Show Analyze Button
-        if (elements.analyzeBtn) {
-            showElement(elements.analyzeBtn);
-            console.log("Analyze button shown");
-        } else {
-            console.error("Analyze button not found in DOM");
-        }
-
-        // Update file info text
-        if (elements.fileInfo) {
-            elements.fileInfo.textContent = file.name;
-        }
+        showElement(elements.analyzeBtn);
+        elements.fileInfo.textContent = file.name;
     };
 
-    // Drag & Drop handlers
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventType => {
-        if (elements.dropArea) {
-            elements.dropArea.addEventListener(eventType, (e) => {
-                e.preventDefault();
-                if (eventType === 'dragenter' || eventType === 'dragover') {
-                    elements.dropArea.classList.add('dragover');
-                } else {
-                    elements.dropArea.classList.remove('dragover');
-                }
-
-                if (eventType === 'drop') {
-                    handleFileUpload(e);
-                }
-            });
-        }
+    // File input change handler
+    elements.fileInput?.addEventListener('change', (e) => {
+        handleFileSelection(e.target.files?.[0]);
     });
 
-    // File input change handler
-    if (elements.fileInput) {
-        elements.fileInput.addEventListener('change', handleFileUpload);
+    // Drag and drop handlers
+    if (elements.dropArea) {
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            elements.dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop area when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            elements.dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            elements.dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        elements.dropArea.addEventListener('drop', handleDrop, false);
     }
 
-    // Browse button click handler
-    const browseBtn = document.getElementById("browse-btn");
-    if (browseBtn) {
-        browseBtn.addEventListener('click', () => {
-            elements.fileInput?.click();
-        });
+    // Browse button
+    document.getElementById("browse-btn")?.addEventListener('click', () => {
+        elements.fileInput?.click();
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight() {
+        elements.dropArea.classList.add('dragover');
+    }
+
+    function unhighlight() {
+        elements.dropArea.classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const file = dt.files[0];
+        handleFileSelection(file);
     }
 }
