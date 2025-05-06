@@ -48,7 +48,7 @@ export function setupAnalysis() {
     const model = document.getElementById("model-select")?.value || "default-model";
 
     const formData = new FormData();
-    formData.append("audio", window.uploadedFile, window.uploadedFile.name || "recorded-audio.wav");
+    formData.append("audio", window.uploadedFile, "recording.wav"); // Consistent filename
     formData.append("model", model);
 
     try {

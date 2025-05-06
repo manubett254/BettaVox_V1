@@ -101,16 +101,34 @@ export function setupRecording() {
                 }
             };
             
+            // In audio-recording.js
             mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
-                const audioUrl = URL.createObjectURL(audioBlob);
-                
-                elements.recordedAudio.src = audioUrl;
-                elements.recordedAudio.controls = true;
-                showElement(elements.recordedAudio);
-                
-                // Store the recorded audio for upload
-                window.uploadedFile = new File([audioBlob], "recording.webm", { type: mediaRecorder.mimeType });
+              try {
+                  // Combine all chunks
+                  const audioBlob = new Blob(audioChunks, { 
+                      type: 'audio/wav' // Force WAV format for compatibility
+                  });
+                  
+                  // Create playable URL
+                  const audioUrl = URL.createObjectURL(audioBlob);
+                  elements.recordedAudio.src = audioUrl;
+                  elements.recordedAudio.controls = true;
+                  showElement(elements.recordedAudio);
+                  
+                  // Convert to WAV file for upload
+                  window.uploadedFile = new File([audioBlob], "recording.wav", { 
+                      type: 'audio/wav' 
+                  });
+                  
+                  // Verify audio is playable
+                  elements.recordedAudio.oncanplay = () => {
+                      console.log("Audio is playable");
+                  };
+                  
+              } catch (error) {
+                  console.error("Error processing recording:", error);
+                  showError("Failed to process recording");
+              }
             };
             
             mediaRecorder.onerror = (event) => {
