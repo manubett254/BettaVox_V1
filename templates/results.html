@@ -52,13 +52,12 @@
                     <div class="voice-avatar">
                         <div class="avatar-circle" id="gender-avatar">
                             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5V12C6.5 15.0376 8.96243 17.5 12 17.5C15.0376 17.5 17.5 15.0376 17.5 12V6.5C17.5 3.46243 15.0376 1 12 1Z" stroke="var(--primary)" stroke-width="2"/>
-                                <path d="M4 10V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V10" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M12 17V20" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5V12C6.5 15.0376 8.96243 17.5 12 17.5C15.0376 17.5 17.5 15.0376 17.5 12V6.5C17.5 3.46243 15.0376 1 12 1Z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M4 10V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 17V20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </div>
                         <div class="avatar-pulse"></div>
-                        <div class="avatar-glow"></div>
                     </div>
                     <div class="voice-waveform">
                         <canvas id="results-waveform" width="400" height="80"></canvas>
@@ -85,8 +84,8 @@
                                 <div class="probability-fill female-fill" id="female-probability"></div>
                             </div>
                             <div class="probability-labels">
-                                <span>Male</span>
-                                <span>Female</span>
+                                <span id="male-label">Male</span>
+                                <span id="female-label">Female</span>
                             </div>
                         </div>
                     </div>
@@ -104,14 +103,17 @@
                         </div>
                         <div class="age-range-indicator">
                             <div class="age-scale">
+                                <div class="age-categories">
+                                    <div class="age-category"></div>
+                                    <div class="age-category"></div>
+                                    <div class="age-category"></div>
+                                </div>
                                 <div class="age-marker" id="age-marker"></div>
                             </div>
                             <div class="age-labels">
-                                <span>0</span>
-                                <span>25</span>
-                                <span>50</span>
-                                <span>75</span>
-                                <span>100+</span>
+                                <span class="age-label">Child</span>
+                                <span class="age-label">Teen</span>
+                                <span class="age-label">Adult</span>
                             </div>
                         </div>
                     </div>
@@ -123,19 +125,28 @@
                         </svg> Voice Characteristics</h3>
                         <div class="voice-features">
                             <div class="feature">
-                                <span class="feature-label">Pitch</span>
+                                <div class="feature-label">
+                                    <span>Pitch</span>
+                                    <span class="feature-value" id="pitch-value">Medium</span>
+                                </div>
                                 <div class="feature-bar">
                                     <div class="feature-fill" id="pitch-level"></div>
                                 </div>
                             </div>
                             <div class="feature">
-                                <span class="feature-label">Tone</span>
+                                <div class="feature-label">
+                                    <span>Tone</span>
+                                    <span class="feature-value" id="tone-value">Warm</span>
+                                </div>
                                 <div class="feature-bar">
                                     <div class="feature-fill" id="tone-level"></div>
                                 </div>
                             </div>
                             <div class="feature">
-                                <span class="feature-label">Clarity</span>
+                                <div class="feature-label">
+                                    <span>Clarity</span>
+                                    <span class="feature-value" id="clarity-value">Clear</span>
+                                </div>
                                 <div class="feature-bar">
                                     <div class="feature-fill" id="clarity-level"></div>
                                 </div>
