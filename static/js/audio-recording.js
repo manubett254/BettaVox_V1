@@ -142,6 +142,12 @@ export function setupRecording() {
             hideElement(elements.dropArea);
             showElement(elements.recordingSection);
             elements.recordingSection.classList.add('active');
+            // Show stop and cancel buttons
+            showElement(elements.stopBtn);
+            showElement(elements.cancelBtn);
+            
+            // Hide analyze button (in case it was showing from a previous recording)
+            hideElement(elements.analyzeBtn);
             
             // Start recording
             mediaRecorder.start(100); // Collect data every 100ms
@@ -189,13 +195,19 @@ export function setupRecording() {
         cleanupMedia();
         clearInterval(recordingInterval);
         
+        // Hide stop and cancel buttons
+        hideElement(elements.stopBtn);
+        hideElement(elements.cancelBtn);
+        
+        // Show analyze button and audio
         showElement(elements.analyzeBtn);
         showElement(elements.recordedAudio);
+
     };
 
     const cancelRecording = () => {
         stopRecording();
-        
+    
         // Reset audio element
         elements.recordedAudio.src = '';
         elements.recordedAudio.controls = false;
@@ -204,8 +216,17 @@ export function setupRecording() {
         // Reset uploaded file
         window.uploadedFile = null;
         
-        // Reset UI
-        resetUI();
+        // Reset UI - show record button, hide others
+        hideElement(elements.recordingSection);
+        elements.recordingSection.classList.remove('active');
+        showElement(elements.recordBtn);
+        showElement(elements.dropArea);
+        elements.recordTimer.textContent = '00:00';
+        hideElement(elements.analyzeBtn);
+        
+        // Ensure stop and cancel buttons are hidden
+        hideElement(elements.stopBtn);
+        hideElement(elements.cancelBtn);
     };
 
     const cleanupMedia = () => {
