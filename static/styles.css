@@ -480,17 +480,22 @@ body {
     flex-direction: column; 
     max-width: 1000px;
     gap: 3rem;
-    margin-top: 2rem;
+    margin: 2rem auto;
+    align-items: center; w
 }
 
 @media (min-width: 768px) {
     .upload-options {
         flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 }
 
 .upload-card {
     flex: 1;
+    min-width: 300px;
+    max-width: 400px;
     background: var(--light);
     border-radius: 20px;
     padding: 2rem;
@@ -636,6 +641,8 @@ body {
     align-items: center;
     margin: 2rem auto;
     max-width: 500px;
+    width: 100%;
+    text-align: center;
 }
 
 .model-selection label {
@@ -668,12 +675,19 @@ body {
     box-shadow: 0 0 0 3px rgba(0, 77, 77, 0.2);
 }
 
-/* Make analyze button more prominent */
+
+.analyze-btn-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 2rem;
+}
+
 .analyze-btn {
-    margin-top: 3rem;
+    margin-top: 0;
     padding: 1.2rem 3rem;
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(172, 8, 8, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 77, 77, 0.3);
     margin-top: 2rem !important;
 }
 
