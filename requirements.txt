@@ -11,3 +11,5 @@ gunicorn
 librosa
 numba
 llvmlite
+Flask
+gunicorn
