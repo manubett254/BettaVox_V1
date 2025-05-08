@@ -5,11 +5,52 @@
     --secondary: #ffcc00;
     --secondary-light: #ffdd33;
     --dark: #121212;
+    
     --light: #ffffff;
     --gray: #f5f5f5;
     --dark-gray: #333333;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
+    
+}
+/* Dark Mode Variables */
+[data-theme="dark"] {
+    --light: #121212;
+    --dark: #ffffff;
+    --gray: #333333;
+    --dark-gray: #f5f5f5;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    
+    /* Adjust animated background for dark mode */
+    .animated-bg {
+        background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+    }
+    
+    /* Adjust glass header for dark mode */
+    .glass-header {
+        background: rgba(18, 18, 18, 0.9);
+    }
+    
+    /* Adjust cards for dark mode */
+    .glass-card {
+        background: rgba(30, 30, 30, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Adjust feature cards for dark mode */
+    .feature-card {
+        background: #1e1e1e;
+    }
+    
+    /* Adjust upload cards for dark mode */
+    .upload-card {
+        background: #1e1e1e;
+    }
+    
+    /* Adjust drop zone for dark mode */
+    .drop-zone {
+        border-color: var(--secondary);
+    }
 }
 
 * {

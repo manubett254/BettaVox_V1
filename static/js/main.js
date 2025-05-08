@@ -2,6 +2,8 @@ import { setupRecording } from './audio-recording.js';
 import { setupFileUpload } from './file-upload.js';
 import { setupAnalysis } from './analysis.js';
 import { initResultsPage } from './results.js';
+import { initTheme } from './dark.js';
+
 import { showElement, hideElement, showError, initToastSystem } from './utils.js';
 
 // Global application state initialization
@@ -18,6 +20,7 @@ const initializeAppState = () => {
 const initCommonFeatures = () => {
   initToastSystem();
   initializeAppState();
+  initTheme(); // Initialize theme system
 
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && window.appState.isProcessing) {
@@ -91,6 +94,8 @@ window.addEventListener('error', function (event) {
     }).catch(e => console.error("Error logging failed:", e));
   }
 });
+
+
 
 // Fire when DOM is ready
 document.addEventListener("DOMContentLoaded", initializeApplication);

@@ -1,6 +1,5 @@
 import librosa
 import numpy as np
-import logging
 
 def extract_features(file_path):
     try:
@@ -11,8 +10,9 @@ def extract_features(file_path):
         # Trim or pad audio to exactly 5 seconds
         target_length = sr * 5
         if len(y) > target_length:
-            start_sample = np.random.randint(0, len(y) - target_length)
+            start_sample = (len(y) - target_length) // 2
             y = y[start_sample:start_sample + target_length]
+
         elif len(y) < target_length:
             y = np.pad(y, (0, target_length - len(y)), mode='constant')
         
