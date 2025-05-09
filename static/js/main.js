@@ -3,6 +3,7 @@ import { setupFileUpload } from './file-upload.js';
 import { setupAnalysis } from './analysis.js';
 import { initResultsPage } from './results.js';
 import { initTheme } from './dark.js';
+import { initAboutPage } from './about.js';
 
 import { showElement, hideElement, showError, initToastSystem } from './utils.js';
 

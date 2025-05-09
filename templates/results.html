@@ -49,18 +49,18 @@
             <div class="results-grid">
                 <!-- Visual Representation -->
                 <div class="results-visual-card glass-card animate__animated animate__fadeInLeft">
-                    <div class="voice-avatar">
-                        <div class="avatar-circle" id="gender-avatar">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5V12C6.5 15.0376 8.96243 17.5 12 17.5C15.0376 17.5 17.5 15.0376 17.5 12V6.5C17.5 3.46243 15.0376 1 12 1Z" stroke="currentColor" stroke-width="2"/>
-                                <path d="M4 10V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M12 17V20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+                    <div class="results-charts">
+                        <!-- Gender Prediction Chart -->
+                        <div class="chart-container">
+                            <h3>Gender Distribution</h3>
+                            <canvas id="gender-chart" width="400" height="250"></canvas>
                         </div>
-                        <div class="avatar-pulse"></div>
-                    </div>
-                    <div class="voice-waveform">
-                        <canvas id="results-waveform" width="400" height="80"></canvas>
+                        
+                        <!-- Age Prediction Chart -->
+                        <div class="chart-container">
+                            <h3>Age Group Distribution</h3>
+                            <canvas id="age-chart" width="400" height="250"></canvas>
+                        </div>
                     </div>
                 </div>
 

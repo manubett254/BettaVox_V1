@@ -93,7 +93,30 @@
             </div>
         </div>
     </main>
-
+    <section class="faq-section">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+    
+        <details class="faq-item">
+            <summary>Which audio formats are supported?</summary>
+            <p>We support .mp3, .wav, .m4a, .ogg, and .flac files up to 10MB in size.</p>
+        </details>
+    
+        <details class="faq-item">
+            <summary>How accurate are the predictions?</summary>
+            <p>Our models achieve up to 85% accuracy for gender and reasonable estimates for age groups. Accuracy depends on voice clarity and recording quality.</p>
+        </details>
+    
+        <details class="faq-item">
+            <summary>Is my audio data private?</summary>
+            <p>Yes. We don’t store your audio unless you explicitly agree to contribute to our research dataset.</p>
+        </details>
+    
+        <details class="faq-item">
+            <summary>What affects prediction accuracy?</summary>
+            <p>Factors like background noise, microphone quality, and speaking style can impact prediction accuracy.</p>
+        </details>
+    </section>
+    
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-container">
@@ -122,5 +145,9 @@
 
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/dark.js') }}"></script>
+    <script type="module">
+    import { initAboutPage } from "{{ url_for('static', filename='js/about.js') }}";
+    document.addEventListener("DOMContentLoaded", initAboutPage);
+  </script>
 </body>
 </html>
