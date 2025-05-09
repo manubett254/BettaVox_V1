@@ -1,254 +1,175 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Unified element references
+export function initResultsPage() {
+    // Get all elements at once
     const elements = {
-        fileInput: document.getElementById("file-input"),
-        dropArea: document.getElementById("drop-area"),
-        fileInfo: document.getElementById("file-info"),
-        uploadedAudio: document.getElementById("uploaded-audio"),
-        analyzeBtn: document.getElementById("analyze-btn"),
-        recordBtn: document.getElementById("record-btn"),
-        stopBtn: document.getElementById("stop-btn"),
-        cancelBtn: document.getElementById("cancel-btn"),
-        recordingContainer: document.getElementById("recording-container"),
-        recordingSection: document.getElementById("recording-section"),
-        recordTimer: document.getElementById("record-timer"),
-        recordedAudio: document.getElementById("recorded-audio"),
-        processingSection: document.getElementById("processing-section"),
-        processingStatus: document.getElementById("processing-status"),
-        waveformCanvas: document.getElementById("waveform"),
-        
-        // Results page elements
         genderResult: document.getElementById("gender-result"),
+        ageResult: document.getElementById("age-result"),
         confidenceScore: document.getElementById("confidence-score"),
         feedbackMessage: document.getElementById("feedback-message"),
+        resultsContainer: document.querySelector(".results-container"),
+        errorContainer: document.querySelector(".error-container") // Add this to your HTML if missing
     };
-    
-    // Audio variables
-    let audioContext, analyser, mediaRecorder, audioStream;
-    let animationFrameId, recordingInterval;
-    let uploadedFile = null;
-    const MAX_RECORD_TIME = 60; // 60 seconds
-
-    // Waveform Visualization
-    const setupWaveform = () => {
-        const ctx = elements.waveformCanvas.getContext('2d');
-        ctx.clearRect(0, 0, elements.waveformCanvas.width, elements.waveformCanvas.height);
-        
-        const draw = () => {
-            if (!analyser) return;
-            
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyser.getByteTimeDomainData(dataArray);
-
-            ctx.fillStyle = '#f0f0f0';
-            ctx.fillRect(0, 0, elements.waveformCanvas.width, elements.waveformCanvas.height);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#004d4d';
-            ctx.beginPath();
-
-            const sliceWidth = elements.waveformCanvas.width * 1.0 / bufferLength;
-            let x = 0;
-
-            for (let i = 0; i < bufferLength; i++) {
-                const v = dataArray[i] / 128.0;
-                const y = v * elements.waveformCanvas.height / 2;
-                
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-                
-                x += sliceWidth;
-            }
-
-            ctx.lineTo(elements.waveformCanvas.width, elements.waveformCanvas.height / 2);
-            ctx.stroke();
-            animationFrameId = requestAnimationFrame(draw);
-        };
-
-        draw();
-    };
-
-    // Recording Management
-    const startRecording = async () => {
-        try {
-            audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioContext = new AudioContext();
-            analyser = audioContext.createAnalyser();
-            const source = audioContext.createMediaStreamSource(audioStream);
-            source.connect(analyser);
-
-            mediaRecorder = new MediaRecorder(audioStream);
-            const audioChunks = [];
-
-            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
-                console.log("Recorded audio Blob:", audioBlob); // Log the Blob
-                const audioUrl = URL.createObjectURL(audioBlob);
-                elements.recordedAudio.src = audioUrl; // Assign the Blob URL to the audio element
-                elements.recordedAudio.controls = true; // Enable controls
-                elements.recordedAudio.style.display = 'block'; // Make the element visible
-                uploadedFile = audioBlob; // Assign the Blob to uploadedFile
-                console.log("Uploaded file after recording:", uploadedFile); // Confirm assignment
-            };
-            // UI Updates
-            hideElement(elements.dropArea);
-            showElement(elements.recordingContainer);
-            showElement(elements.recordingSection);
-            hideElement(elements.recordBtn);
-            setupWaveform();
-            mediaRecorder.start();
-
-            // Timer
-            let seconds = 0;
-                recordingInterval = setInterval(() => {
-                    seconds++;
-                    const minutes = Math.floor(seconds / 60);
-                    elements.recordTimer.textContent = `Recording: ${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-
-                    if (seconds >= MAX_RECORD_TIME) stopRecording();
-                }, 1000);
-
-
-        } catch (error) {
-            showError('Microphone access required for recording');
+  
+    // Check for results immediately
+    checkAndDisplayResults(elements);
+  
+    // Set up periodic check if needed (optional)
+    const resultsCheckInterval = setInterval(() => {
+        if (checkAndDisplayResults(elements)) {
+            clearInterval(resultsCheckInterval);
         }
-        
-    };
-
-    const stopRecording = () => {
-        if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
-        cleanupMedia();
-        clearInterval(recordingInterval);
-        resetUI();
-        showElement(elements.analyzeBtn); // Show the Analyze button
-        showElement(elements.recordedAudio); // Ensure the recorded audio is visible
-    };
-
-    const cancelRecording = () => {
-        stopRecording();
-        elements.recordedAudio.src = '';
-        elements.recordedAudio.controls = false;
-        hideElement(elements.recordedAudio);
-        uploadedFile = null;
-    };
-
-    const cleanupMedia = () => {
-        if (audioStream) {
-            audioStream.getTracks().forEach(track => track.stop());
-            audioStream = null;
-        }
-        cancelAnimationFrame(animationFrameId);
-    };
-
-    const resetUI = () => {
-        hideElement(elements.recordingSection);
-        showElement(elements.recordBtn);
-        showElement(elements.dropArea);
-        elements.recordTimer.textContent = '00:00';
-        showElement(elements.analyzeBtn); // Ensure this line is executed
-    };
-
-    // File Handling
-    const handleFileUpload = (event) => {
-        const file = event.target.files ? event.target.files[0] : event.dataTransfer.files[0];
-        if (!file || !file.type.startsWith('audio/')) {
-            showError('Please upload a valid audio file (WAV, MP3, OGG)');
-            return;
-        }
-    
-        uploadedFile = file;
-        elements.uploadedAudio.src = URL.createObjectURL(file);
-        showElement(elements.uploadedAudio);
-        hideElement(elements.recordingContainer);
-        showElement(elements.analyzeBtn);
-    };
-    
-
-    // Analysis Submission
-    const analyzeAudio = async () => {
-        if (!uploadedFile) {
-            showError('No audio file selected!');
-            return;
-        }
-    
-        const model = document.getElementById("model-select").value;
-    
-        const formData = new FormData();
-        formData.append("audio", uploadedFile, uploadedFile.name || "recorded-audio.wav");
-        formData.append("model", model); // ⬅️ Include the selected model
-        console.log("Selected model:", model);
-        showElement(elements.processingSection);
-        elements.processingStatus.textContent = "🎵 Extracting features...";
-    
-        try {
-            const response = await fetch("/predict", {
-                method: "POST",
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: formData
-            });
-    
-            if (!response.ok) throw new Error("Prediction failed");
-    
-            const results = await response.json();
-            localStorage.setItem("analysisResults", JSON.stringify(results));
-            window.location.href = "/results";
-        } catch (error) {
-            console.error(error);
-            elements.processingStatus.textContent = "❌ Error processing audio";
-            setTimeout(() => window.location.href = "/error", 2000);
-        }
-    };
-    
-
-    // Results Page Logic
-    if (window.location.pathname === "/results") {
-        const results = JSON.parse(localStorage.getItem("analysisResults")); // Replaced sessionStorage with localStorage
-        
-        if (!results) {
-            alert("No results found. Please try again.");
-            window.location.href = "/upload";
-            return;
-        }
-
-        elements.genderResult.textContent = results.gender;
-        elements.confidenceScore.textContent = `${results.confidence.toFixed(2)}%`;
-
+    }, 500);
+  
+    // Clean up on unmount if using SPA framework
+    return () => clearInterval(resultsCheckInterval);
+  }
+  
+  function checkAndDisplayResults(elements) {
+    const rawResults = localStorage.getItem("analysisResults");
+  
+    if (!rawResults) {
+        showError(elements, "No analysis results found. Please try analyzing an audio file again.");
+        return false;
     }
-
-    // Helper Functions
-    const showElement = (el) => el.classList.remove("hidden");
-    const hideElement = (el) => el.classList.add("hidden");
-    const showError = (msg) => alert(msg); // Replace with toast implementation
-
-    // Event Listeners
-    if (elements.fileInput) {
-        elements.fileInput.addEventListener("change", handleFileUpload);
-    } else {
-        console.error("File input element not found!");
+  
+    let results;
+    try {
+        results = JSON.parse(rawResults);
+        
+        // Validate required fields
+        if (!results.gender || !results.gender_confidence) {
+            throw new Error("Incomplete results data");
+        }
+    } catch (e) {
+        console.error("Results processing error:", e);
+        showError(elements, "Invalid or incomplete result data. Please try again.");
+        return false;
     }
-    elements.recordBtn.addEventListener("click", startRecording);
-    elements.stopBtn.addEventListener("click", stopRecording);
-    elements.cancelBtn.addEventListener("click", cancelRecording);
-    elements.analyzeBtn.addEventListener("click", analyzeAudio);
+  
+    // Display results
+    displayResults(elements, results);
+    return true;
+  }
+  
+  // Update your submitFeedback and submitCorrection functions in results.js:
+  
+  async function submitFeedback(isCorrect) {
+    const results = JSON.parse(localStorage.getItem("analysisResults"));
     
-    // Drag & Drop Handlers
-    ['dragenter', 'dragover'].forEach(event => {
-        elements.dropArea.addEventListener(event, e => {
-            e.preventDefault();
-            elements.dropArea.classList.add('dragover');
+    try {
+        const response = await fetch('/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: results.id,
+                is_correct: isCorrect ? 1 : 0
+            })
         });
-    });
-
-    ['dragleave', 'drop'].forEach(event => {
-        elements.dropArea.addEventListener(event, e => {
-            e.preventDefault();
-            elements.dropArea.classList.remove('dragover');
+  
+        if (!response.ok) {
+            throw new Error('Feedback submission failed');
+        }
+  
+        const feedbackMessage = document.getElementById("feedback-message");
+        feedbackMessage.classList.remove("hidden");
+        
+        if (isCorrect) {
+            feedbackMessage.querySelector('svg path').setAttribute('fill', '#4BB543');
+            feedbackMessage.querySelector('h4').textContent = 'Thank You!';
+            feedbackMessage.querySelector('p').textContent = 'Your feedback has been submitted successfully.';
+        } else {
+            feedbackMessage.querySelector('svg path').setAttribute('fill', '#ff4444');
+            feedbackMessage.querySelector('h4').textContent = 'Correction Needed';
+            feedbackMessage.querySelector('p').textContent = 'Please provide more details below.';
+            document.getElementById("correction-form").classList.remove("hidden");
+        }
+        
+        document.querySelector('.feedback-options').classList.add("hidden");
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        showError({ feedbackMessage: document.getElementById("feedback-message") }, "Failed to submit feedback. Please try again.");
+    }
+  }
+  
+  function displayResults(elements, results) {
+    // Hide error container if visible
+    if (elements.errorContainer) {
+        elements.errorContainer.style.display = "none";
+    }
+  
+    // Show results container
+    if (elements.resultsContainer) {
+        elements.resultsContainer.style.display = "block";
+    }
+  
+    // Set results
+    elements.genderResult.textContent = results.gender ? capitalizeFirstLetter(results.gender) : "Unknown";
+    
+    if (elements.ageResult) {
+        elements.ageResult.textContent = results.age_group || "Unknown";
+    }
+    
+    if (elements.confidenceScore) {
+        elements.confidenceScore.textContent = `${(results.gender_confidence || 0).toFixed(2)}%`;
+    }
+  }
+  
+  function showError(elements, message) {
+    // Hide results container if visible
+    if (elements.resultsContainer) {
+        elements.resultsContainer.style.display = "none";
+    }
+  
+    // Show error container
+    if (elements.errorContainer) {
+        elements.errorContainer.style.display = "block";
+    }
+  
+    // Set error message
+    if (elements.feedbackMessage) {
+        elements.feedbackMessage.textContent = `⚠️ ${message}`;
+        elements.feedbackMessage.style.display = "block";
+    }
+  }
+  
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  
+  async function submitCorrection() {
+    const results = JSON.parse(localStorage.getItem("analysisResults"));
+    const correctGender = document.getElementById("correct-gender").value;
+    const correctAge = document.getElementById("correct-age").value;
+    const wrongGender = document.getElementById("wrong-gender").checked;
+    const wrongAge = document.getElementById("wrong-age").checked;
+  
+    try {
+        const response = await fetch('/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: results.id,
+                is_correct: 0,
+                corrected_gender: wrongGender ? correctGender : null,
+                corrected_age_group: wrongAge ? correctAge : null
+            })
         });
-    });
-
-    elements.dropArea.addEventListener('drop', handleFileUpload);
-    document.getElementById("browse-btn").addEventListener("click", () => elements.fileInput.click());
-});
+  
+        if (!response.ok) {
+            throw new Error('Correction submission failed');
+        }
+  
+        const feedbackMessage = document.getElementById("feedback-message");
+        feedbackMessage.querySelector('svg path').setAttribute('fill', '#4BB543');
+        feedbackMessage.querySelector('h4').textContent = 'Correction Submitted';
+        feedbackMessage.querySelector('p').textContent = 'Thank you for helping improve our model!';
+        
+        document.getElementById("correction-form").classList.add("hidden");
+    } catch (error) {
+        console.error('Error submitting correction:', error);
+        showError({ feedbackMessage: document.getElementById("feedback-message") }, "Failed to submit correction. Please try again.");
+    }
+  }
