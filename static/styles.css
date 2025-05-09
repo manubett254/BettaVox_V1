@@ -744,9 +744,7 @@ body {
     display: inline-flex !important;
   }
 
-/* Processing Overlay */
-
-/* Processing Overlay - Complete Version */
+  /* Processing Overlay */
 .processing-overlay {
     position: fixed;
     top: 0;
@@ -758,16 +756,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 1001; /* Higher than header (1000) */
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 .processing-overlay.active {
     opacity: 1;
     pointer-events: all;
-    display: flex;
+}
+
+.processing-overlay.hidden {
+    display: none;
 }
 
 .processing-content {
@@ -777,36 +778,10 @@ body {
     background: var(--light);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
 }
 
-.processing-overlay.active .processing-content {
-    transform: translateY(0);
-}
+/* Keep all your existing spinner and progress bar styles */
 
-.processing-content h2 {
-    margin-bottom: 0.5rem;
-    color: var(--primary);
-    font-size: 1.8rem;
-}
-
-.processing-content p {
-    color: var(--dark-gray);
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-.processing-spinner {
-    width: 60px;
-    height: 60px;
-    border: 5px solid rgba(0, 77, 77, 0.1);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    margin: 0 auto 1.5rem;
-    animation: spin 1s linear infinite;
-}
 
 .progress-container {
     width: 100%;

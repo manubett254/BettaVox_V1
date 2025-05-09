@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Processing Animation Test</title>
+  <style>
+    .processing-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .processing-overlay.active {
+      display: flex;
+    }
+    
+    .progress-bar {
+      width: 300px;
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #004d4d, #006666);
+      transition: width 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <button id="test-btn">Test Animation</button>
+  
+  <div id="processing-section" class="processing-overlay">
+    <div class="processing-content">
+      <div class="processing-spinner">🌀</div>
+      <h2>Processing Test</h2>
+      <p id="processing-status">Initializing...</p>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const elements = {
+      testBtn: document.getElementById("test-btn"),
+      processingSection: document.getElementById("processing-section"),
+      processingStatus: document.getElementById("processing-status"),
+      progressBar: document.querySelector(".progress"),
+    };
+
+    let progressInterval = null;
+
+    const startProcessingAnimation = () => {
+      elements.progressBar.style.width = "0%";
+      elements.processingStatus.textContent = "Processing started...";
+      elements.processingSection.classList.add("active");
+
+      let width = 0;
+      progressInterval = setInterval(() => {
+        if (width >= 100) {
+          clearInterval(progressInterval);
+          return;
+        }
+        width += 2;
+        elements.progressBar.style.width = `${width}%`;
+      }, 50);
+    };
+
+    const stopProcessingAnimation = (success = true) => {
+      clearInterval(progressInterval);
+      elements.progressBar.style.width = "100%";
+      elements.processingStatus.textContent = success 
+        ? "✅ Processing Complete!" 
+        : "❌ Processing Failed";
+    };
+
+    elements.testBtn.addEventListener("click", () => {
+      // Test sequence
+      startProcessingAnimation();
+      
+      // Simulate completion after 3 seconds
+      setTimeout(() => {
+        stopProcessingAnimation(true);
+        
+        // Hide after another 1 second
+        setTimeout(() => {
+          elements.processingSection.classList.remove("active");
+        }, 1000);
+      }, 3000);
+    });
+  </script>
+</body>
+</html>

@@ -1,11 +1,16 @@
 export function showElement(el) {
-    el?.classList?.remove("hidden");
+    if (el) {
+        el.classList.remove("hidden");
+        el.classList.add("active");
+    }
 }
 
 export function hideElement(el) {
-    el?.classList?.add("hidden");
+    if (el) {
+        el.classList.remove("active");
+        el.classList.add("hidden");
+    }
 }
-
 
 // utils.js (additional functionality)
 export function initToastSystem() {
