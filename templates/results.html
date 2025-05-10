@@ -251,6 +251,13 @@
                     </svg>
                     Share Results
                 </button>
+                <!-- Add this to your action buttons section -->
+                <button class="btn secondary-btn large" id="download-results">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 12V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V12M12 3V15M12 15L8 11M12 15L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Download Results
+                </button>
             </div>
         </div>
     </main>
@@ -263,6 +270,41 @@
             </a>
         </div>
     </div>
+    <!-- Share Modal (hidden by default) -->
+<div id="share-modal" class="share-modal hidden">
+  <div class="share-modal-content glass-card">
+    <div class="share-modal-header">
+      <h3>Share Your Results</h3>
+      <button class="close-modal">&times;</button>
+    </div>
+    <div class="share-options">
+      <button class="share-option" data-platform="whatsapp">
+        <img src="{{ url_for('static', filename='images/whatsapp-icon.png') }}" alt="WhatsApp">
+        WhatsApp
+      </button>
+      <button class="share-option" data-platform="facebook">
+        <img src="{{ url_for('static', filename='images/facebook-icon.png') }}" alt="Facebook">
+        Facebook
+      </button>
+      <button class="share-option" data-platform="twitter">
+        <img src="{{ url_for('static', filename='images/twitter-icon.png') }}" alt="Twitter">
+        Twitter
+      </button>
+      <button class="share-option" data-platform="linkedin">
+        <img src="{{ url_for('static', filename='images/linkedin-icon.png') }}" alt="LinkedIn">
+        LinkedIn
+      </button>
+      <button class="share-option" data-platform="copy">
+        <img src="{{ url_for('static', filename='images/copy-icon.png') }}" alt="Copy Link">
+        Copy Link
+      </button>
+    </div>
+    <div class="share-link-container">
+      <input type="text" id="share-link" readonly>
+      <button id="copy-link-btn">Copy</button>
+    </div>
+  </div>
+</div>
 
     <!-- Footer -->
     <footer class="footer">
