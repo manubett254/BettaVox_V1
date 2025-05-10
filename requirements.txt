@@ -5,11 +5,8 @@ pandas
 librosa
 scikit-learn
 werkzeug
-joblib 
+joblib
 soundfile
 gunicorn
-librosa
 numba
 llvmlite
-Flask
-gunicorn
