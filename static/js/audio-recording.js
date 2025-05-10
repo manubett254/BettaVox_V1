@@ -1,5 +1,43 @@
 import { showElement, hideElement, showError } from "./utils.js";
 
+// WAV file creation utilities
+function writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
+}
+
+function createWaveFileBuffer(leftChannel, sampleRate) {
+    const length = leftChannel.length * 2;
+    const buffer = new ArrayBuffer(44 + length);
+    const view = new DataView(buffer);
+
+    // Write WAV header
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + length, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true); // Byte rate
+    view.setUint16(32, 2, true); // Block align
+    view.setUint16(34, 16, true); // Bits per sample
+    writeString(view, 36, 'data');
+    view.setUint32(40, length, true);
+
+    // Write audio samples
+    const volume = 1;
+    let index = 44;
+    for (let i = 0; i < leftChannel.length; i++) {
+        view.setInt16(index, leftChannel[i] * (0x7FFF * volume), true);
+        index += 2;
+    }
+
+    return buffer;
+}
+
 export function setupRecording() {
     const elements = {
         recordBtn: document.getElementById("record-btn"),
@@ -19,6 +57,10 @@ export function setupRecording() {
     let audioChunks = [];
 
     const setupWaveform = () => {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+        
         const ctx = elements.waveformCanvas.getContext('2d');
         const width = elements.waveformCanvas.width;
         const height = elements.waveformCanvas.height;
@@ -68,20 +110,25 @@ export function setupRecording() {
         try {
             // Reset previous recording if any
             audioChunks = [];
+            cleanupMedia();
             
-            // Get audio stream
+            // Get audio stream with specific constraints
             audioStream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
                     channelCount: 1,
                     sampleRate: 16000,
-                    sampleSize: 16,
                     echoCancellation: true,
-                    noiseSuppression: true
-                }
+                    noiseSuppression: true,
+                    autoGainControl: false
+                },
+                video: false
             });
             
             // Setup audio context and analyzer
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                sampleRate: 16000
+            });
+            
             analyser = audioContext.createAnalyser();
             analyser.fftSize = 2048;
             
@@ -89,11 +136,14 @@ export function setupRecording() {
             source.connect(analyser);
             
             // Setup media recorder
-            const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 
-                'audio/webm' : 
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 
+                'audio/webm;codecs=opus' : 
                 'audio/mp4';
             
-            mediaRecorder = new MediaRecorder(audioStream, { mimeType });
+            mediaRecorder = new MediaRecorder(audioStream, { 
+                mimeType,
+                audioBitsPerSecond: 128000
+            });
             
             mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -101,40 +151,67 @@ export function setupRecording() {
                 }
             };
             
-            // In audio-recording.js
-            mediaRecorder.onstop = () => {
-              try {
-                  // Combine all chunks
-                  const audioBlob = new Blob(audioChunks, { 
-                      type: 'audio/wav' // Force WAV format for compatibility
-                  });
-                  
-                  // Create playable URL
-                  const audioUrl = URL.createObjectURL(audioBlob);
-                  elements.recordedAudio.src = audioUrl;
-                  elements.recordedAudio.controls = true;
-                  showElement(elements.recordedAudio);
-                  
-                  // Convert to WAV file for upload
-                  window.uploadedFile = new File([audioBlob], "recording.wav", { 
-                      type: 'audio/wav' 
-                  });
-                  
-                  // Verify audio is playable
-                  elements.recordedAudio.oncanplay = () => {
-                      console.log("Audio is playable");
-                  };
-                  
-              } catch (error) {
-                  console.error("Error processing recording:", error);
-                  showError("Failed to process recording");
-              }
+            mediaRecorder.onstop = async () => {
+                try {
+                    // Create blob from chunks
+                    const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+                    
+                    // Create playable version
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    elements.recordedAudio.src = audioUrl;
+                    elements.recordedAudio.controls = true;
+                    showElement(elements.recordedAudio);
+                    showElement(elements.analyzeBtn);
+                    
+                    // Process for WAV conversion
+                    try {
+                        const arrayBuffer = await audioBlob.arrayBuffer();
+                        const offlineContext = new OfflineAudioContext(1, audioContext.sampleRate * MAX_RECORD_TIME, audioContext.sampleRate);
+                        const audioBuffer = await offlineContext.decodeAudioData(arrayBuffer);
+                        
+                        const leftChannel = audioBuffer.getChannelData(0);
+                        const wavBuffer = createWaveFileBuffer(leftChannel, audioBuffer.sampleRate);
+                        const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+                        
+                        window.uploadedFile = new File([wavBlob], "recording.wav", {
+                            type: 'audio/wav',
+                            lastModified: Date.now()
+                        });
+                        
+                        console.log("WAV conversion successful");
+                    } catch (convertError) {
+                        console.error("WAV conversion failed, using original format:", convertError);
+                        window.uploadedFile = new File([audioBlob], "recording.audio", {
+                            type: mediaRecorder.mimeType,
+                            lastModified: Date.now()
+                        });
+                    }
+                    
+                    // Setup audio playback verification
+                    elements.recordedAudio.oncanplay = () => {
+                        console.log("Audio ready for playback");
+                        showElement(elements.analyzeBtn);
+                    };
+                    
+                    elements.recordedAudio.onerror = () => {
+                        console.error("Audio playback failed");
+                        showError("Recording playback failed. Please try again.");
+                    };
+                    
+                } catch (error) {
+                    console.error("Error in onstop handler:", error);
+                    showError("Failed to process recording");
+                    resetUI();
+                } finally {
+                    cleanupMedia();
+                }
             };
             
             mediaRecorder.onerror = (event) => {
-                console.error("Recording error:", event.error);
+                console.error("MediaRecorder error:", event.error);
                 showError("Recording error occurred. Please try again.");
                 cleanupMedia();
+                resetUI();
             };
             
             // Update UI
@@ -142,11 +219,8 @@ export function setupRecording() {
             hideElement(elements.dropArea);
             showElement(elements.recordingSection);
             elements.recordingSection.classList.add('active');
-            // Show stop and cancel buttons
             showElement(elements.stopBtn);
             showElement(elements.cancelBtn);
-            
-            // Hide analyze button (in case it was showing from a previous recording)
             hideElement(elements.analyzeBtn);
             
             // Start recording
@@ -181,7 +255,6 @@ export function setupRecording() {
             };
             
             showError(errorMessages[error.name] || 'Failed to access microphone. Please try again.');
-            
             cleanupMedia();
             resetUI();
         }
@@ -191,67 +264,33 @@ export function setupRecording() {
         if (mediaRecorder && mediaRecorder.state === "recording") {
             mediaRecorder.stop();
         }
-        
-        cleanupMedia();
         clearInterval(recordingInterval);
-        
-        // Hide stop and cancel buttons
         hideElement(elements.stopBtn);
         hideElement(elements.cancelBtn);
-        
-        // Show analyze button and audio
-        showElement(elements.analyzeBtn);
-        showElement(elements.recordedAudio);
-
     };
 
     const cancelRecording = () => {
         stopRecording();
-    
-        // Reset audio element
         elements.recordedAudio.src = '';
-        elements.recordedAudio.controls = false;
         hideElement(elements.recordedAudio);
-        
-        // Reset uploaded file
         window.uploadedFile = null;
-        
-        // Reset UI - show record button, hide others
-        hideElement(elements.recordingSection);
-        elements.recordingSection.classList.remove('active');
-        showElement(elements.recordBtn);
-        showElement(elements.dropArea);
-        elements.recordTimer.textContent = '00:00';
-        hideElement(elements.analyzeBtn);
-        
-        // Ensure stop and cancel buttons are hidden
-        hideElement(elements.stopBtn);
-        hideElement(elements.cancelBtn);
+        resetUI();
     };
 
     const cleanupMedia = () => {
-        // Stop all media tracks
         if (audioStream) {
             audioStream.getTracks().forEach(track => track.stop());
             audioStream = null;
         }
         
-        // Stop animation frame
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
         }
         
-        // Disconnect audio nodes
-        if (audioContext) {
-            if (audioContext.state !== 'closed') {
-                audioContext.close();
-            }
-            audioContext = null;
+        if (audioContext && audioContext.state !== 'closed') {
+            audioContext.close().catch(e => console.warn("AudioContext close error:", e));
         }
-        
-        analyser = null;
-        mediaRecorder = null;
     };
 
     const resetUI = () => {
@@ -268,7 +307,6 @@ export function setupRecording() {
     elements.stopBtn?.addEventListener('click', stopRecording);
     elements.cancelBtn?.addEventListener('click', cancelRecording);
 
-    // Cleanup on page unload
     window.addEventListener('beforeunload', cleanupMedia);
 
     return {

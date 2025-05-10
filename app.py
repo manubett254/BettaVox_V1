@@ -139,6 +139,10 @@ def predict():
         try:
             logging.info(f"🟢 Processing file: {filepath}")
             features = extract_features(filepath)
+            if features is None:
+                logging.error("Feature extraction failed")
+                return jsonify({"error": "Failed to extract features from audio"}), 500
+
             features_df = pd.DataFrame([features], columns=FEATURE_LIST)
             
             # Predict Gender
